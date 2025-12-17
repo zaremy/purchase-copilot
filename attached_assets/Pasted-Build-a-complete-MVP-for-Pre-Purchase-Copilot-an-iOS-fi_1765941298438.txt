@@ -1,0 +1,155 @@
+Build a complete MVP for Pre-Purchase Copilot, an iOS-first mobile app (React Native + Expo) that helps users make informed decisions when buying used cars. I’ve attached the complete product specification documents. Please read all attachments carefully before starting.
+
+Core Requirements
+Tech Stack (as specified in technical_architecture.md):
+
+	•	Frontend: React Native + Expo (iOS first, with path to Android)
+	•	Backend: Node.js + Express.js
+	•	Database: PostgreSQL with the exact schema provided in technical_architecture.md
+	•	LLM: OpenAI API (GPT-4) with structured JSON output mode
+	•	VIN Decoding: NHTSA vPIC API (free, public)
+
+Critical Architecture Principles:
+
+	1.	The mobile app NEVER directly calls the LLM or NHTSA APIs - all requests must go through the backend
+	2.	All LLM interactions must follow the strict “field-only” constraint - the LLM only sees structured JSON field data, never images or PDFs
+	3.	Every LLM output must cite source field IDs (the “Cite-Your-Fields” guardrail)
+	4.	For MVP, use local storage on device (no user accounts/cloud sync yet)
+
+Implementation Priorities (Build in This Order)
+Milestone 1: The Inspector (Core Checklist)
+
+	1.	Implement the complete PostgreSQL schema from technical_architecture.md
+	2.	Create the Express.js backend with endpoints for:
+	◦	Creating a candidate (POST /api/candidates)
+	◦	VIN decoding via NHTSA (GET /api/vehicles/decode/:vin)
+	◦	Saving field responses (POST /api/candidates/:id/responses)
+	3.	Build the React Native UI for:
+	◦	Candidates List screen (see ux_wireframes.md)
+	◦	Add Candidate modal (VIN input)
+	◦	Candidate Detail screen with tabbed interface
+	◦	Item Detail screen for checklist input
+	4.	Implement the complete 68-item base checklist from full_checklist.md
+	5.	All data stored locally using AsyncStorage or SQLite
+
+Milestone 2: Contextual Checklist Generation (NEW FEATURE)
+
+	1.	After successful VIN decode, call the LLM with Prompt Template 0 from llm_prompts.md
+	2.	Present the 3-5 suggested vehicle-specific items to the user in a modal
+	3.	Allow user to accept/reject each suggestion
+	4.	Add accepted items to the candidate’s checklist with source=‘llm_generated’
+	5.	Display these items with a special badge/icon in the checklist UI
+
+Milestone 3: The Analyst (Scoring & Intelligence)
+
+	1.	Implement the Risk Score calculation from feature_spec.md section 3
+	2.	Implement the Completeness Score calculation
+	3.	Display both scores prominently on the Candidate Detail screen
+	4.	Auto-create Issue objects when user marks an item as “Fail” with severity > 5
+	5.	Make the Risk Score tappable to show a breakdown
+
+Milestone 4: The Copilot (LLM Integration)
+
+	1.	Create backend endpoint for LLM queries (POST /api/copilot/query)
+	2.	Implement the field snapshot JSON generation (see llm_prompts.md)
+	3.	Build the Copilot chat interface (see ux_wireframes.md Screen 5)
+	4.	Implement Prompt Templates 1-4 from llm_prompts.md:
+	◦	Vehicle Summary
+	◦	Multi-Vehicle Comparison
+	◦	Generate Seller Questions
+	◦	Negotiation Pack
+	5.	Validate all LLM outputs against the expected JSON schemas
+	6.	Make facts/inferences tappable to highlight source fields
+
+Milestone 5: The Shopper (Comparison & Negotiation)
+
+	1.	Build the Comparison Matrix screen (ux_wireframes.md Screen 4)
+	2.	Implement the Negotiation Builder (feature_spec.md section 4)
+	3.	Generate the Vehicle Dossier PDF (feature_spec.md section 5)
+	4.	Implement PDF export and iOS share sheet integration
+
+Key Implementation Details
+VIN Decoding Flow:
+
+	•	User enters VIN → Backend checks if VIN exists in vehicles table (cached within 30 days)
+	•	If not cached, call NHTSA API: `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/{VIN}?format=json`
+	•	Parse response and store in vehicles table
+	•	Return vehicle attributes to app
+	•	Immediately trigger contextual checklist generation
+
+LLM Guardrails (CRITICAL):
+
+	•	Use OpenAI’s JSON mode to enforce structured output
+	•	Every LLM prompt must include the system instruction from llm_prompts.md
+	•	Validate that every statement in the LLM response includes a `source_fields` array
+	•	If validation fails, show error to user and log for debugging
+	•	Never send images, PDFs, or unstructured text to the LLM
+
+Field Response Storage:
+
+	•	Each checklist item response creates a FieldResponse record
+	•	Store the timestamp for every response
+	•	Support all response types: pass/fail/unknown, severity (1-10), numeric, picklist, text
+	•	Allow users to edit responses (update the timestamp)
+
+Offline Support:
+
+	•	User should be able to complete checklist and take photos offline
+	•	Queue API calls for when connectivity returns
+	•	Show clear offline indicator in UI
+
+UI/UX Requirements
+Follow the detailed wireframe descriptions in ux_wireframes.md:
+
+	•	Use iOS native components where possible (via React Native)
+	•	Bottom tab navigation: Candidates | Compare | Copilot | Library
+	•	Color-coded risk scores: Green (0-30), Yellow (31-60), Red (61-100)
+	•	Progress bars for checklist completion
+	•	Accordion-style checklist sections
+	•	Large, tappable input controls for checklist items
+
+Environment Variables Needed
+￼
+Testing Requirements
+Create at least one end-to-end test flow:
+
+	1.	Add a candidate with VIN “1HGBH41JXMN109186” (2016 Honda Accord)
+	2.	Verify contextual checklist items are generated (should include Honda-specific issues)
+	3.	Complete at least 10 checklist items
+	4.	Verify risk score updates in real-time
+	5.	Ask Copilot “What are my top risks?”
+	6.	Verify the response cites specific field IDs
+
+What NOT to Build (Out of Scope for MVP)
+	•	User accounts or authentication
+	•	Cloud sync
+	•	Paid history report integration
+	•	Mechanic marketplace
+	•	Android-specific features
+	•	In-app purchases (we’ll add this in Milestone 5 later)
+
+Reference Documents
+Please carefully read these attached files in order:
+
+	1.	README.md - Overview and quick start
+	2.	prd.md - Complete product requirements
+	3.	architecture.md - User journeys and data flow
+	4.	feature_spec.md - Detailed feature specifications
+	5.	technical_architecture.md - Tech stack and database schema
+	6.	ux_wireframes.md - Screen layouts and interactions
+	7.	full_checklist.md - Complete 68-item checklist
+	8.	llm_prompts.md - LLM prompt templates and guardrails
+
+Success Criteria
+The MVP is complete when:
+
+	•	A user can add a vehicle via VIN
+	•	The app generates and displays contextual checklist items
+	•	The user can complete the entire hybrid checklist (base + contextual)
+	•	Risk and Completeness scores are calculated and displayed
+	•	The user can ask the Copilot for a summary and receive a valid, field-cited response
+	•	The user can compare 2 vehicles side-by-side
+	•	The user can generate a negotiation pack
+	•	The user can export a Vehicle Dossier PDF
+
+Start with Milestone 1 and work sequentially. Ask clarifying questions
