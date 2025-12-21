@@ -321,22 +321,28 @@ export default function CandidateDetail() {
                   
                   {isIssuesExpanded && (
                     <div className="bg-white divide-y divide-neutral-100">
-                      {failedItems.map((item) => (
-                        <Link key={item.id} href={`/candidate/${candidate.id}/checklist/${item.section}`}>
-                          <div className="flex items-center justify-between py-4 px-6 hover:bg-neutral-50 transition-colors cursor-pointer group">
-                            <div className="flex items-center gap-3">
-                              <div className="w-1.5 h-1.5 rounded-full bg-primary ring-2 ring-primary/20 ring-offset-2 ring-offset-white" />
-                              <div>
-                                <h4 className="font-bold text-xs text-neutral-900 uppercase tracking-wide group-hover:text-primary transition-colors">
-                                  {item.question}
-                                </h4>
-                                <span className="text-[10px] text-neutral-400 uppercase tracking-wide">{item.section}</span>
+                      {failedItems.map((item) => {
+                        const itemResponse = responses[item.id];
+                        return (
+                          <Link key={item.id} href={`/candidate/${candidate.id}/checklist/${item.section}`}>
+                            <div className="flex items-center justify-between py-4 px-6 hover:bg-neutral-50 transition-colors cursor-pointer group">
+                              <div className="flex items-center gap-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary ring-2 ring-primary/20 ring-offset-2 ring-offset-white shrink-0 self-start mt-1" />
+                                <div>
+                                  <h4 className="font-bold text-xs text-neutral-900 uppercase tracking-wide group-hover:text-primary transition-colors">
+                                    {item.question}
+                                  </h4>
+                                  <span className="text-[10px] text-neutral-400 uppercase tracking-wide">{item.section}</span>
+                                  {itemResponse?.notes && (
+                                    <p className="text-xs text-neutral-600 mt-1 normal-case tracking-normal">{itemResponse.notes}</p>
+                                  )}
+                                </div>
                               </div>
+                              <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-primary transition-colors shrink-0" />
                             </div>
-                            <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-primary transition-colors" />
-                          </div>
-                        </Link>
-                      ))}
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

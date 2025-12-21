@@ -135,15 +135,17 @@ export default function ChecklistSection() {
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="mt-3 pt-3 border-t border-neutral-100 flex gap-2">
-                       <button className="flex items-center gap-1.5 px-3 py-2 bg-white border border-neutral-300 hover:bg-neutral-50 rounded-sm text-[10px] font-bold uppercase tracking-wide text-neutral-900 transition-colors shadow-sm">
-                         <Camera className="w-3.5 h-3.5" />
-                         Add Photo
-                       </button>
+                    <div className="mt-3 pt-3 border-t border-neutral-100">
                        <input 
                          type="text" 
                          placeholder="ADD NOTES..." 
-                         className="flex-1 bg-neutral-50 border border-neutral-200 rounded-sm px-3 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-neutral-400 placeholder:text-[10px] placeholder:font-medium placeholder:uppercase"
+                         value={response?.notes || ''}
+                         onChange={(e) => setChecklistResponse(candidate.id, item.id, { 
+                           ...response, 
+                           itemId: item.id, 
+                           notes: e.target.value 
+                         })}
+                         className="w-full bg-neutral-50 border border-neutral-200 rounded-sm px-3 py-2 text-xs text-neutral-900 focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-neutral-400 placeholder:text-[10px] placeholder:font-medium placeholder:uppercase"
                        />
                     </div>
                   </motion.div>
