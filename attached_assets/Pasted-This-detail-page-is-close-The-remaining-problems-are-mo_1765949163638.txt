@@ -1,0 +1,60 @@
+This detail page is close. The remaining problems are mostly “premium-fit/finish” consistency, not layout.
+
+### 1) Header + hero block
+
+* The hero area reads like a “poster strip,” but the inner VIN module looks like a nested card floating in a void. Make the VIN module either:
+
+  * flush (no border/shadow, just typography on the hero), or
+  * a true card (clear border, consistent radius, consistent padding) that aligns to the content grid below.
+* Tighten the header typography: “2016 HONDA” and “ACCORD” need a deliberate type scale (either stronger hierarchy or closer tracking + smaller subtitle). Right now it’s generic.
+
+### 2) Price / Mileage row
+
+* Good: big price is doing the heavy lifting.
+* Fix: the mileage cluster feels like an afterthought (icon + “82k” + “MILES” is mis-weighted).
+
+  * Make “82k” match the visual weight of price’s label treatment (not size, weight discipline).
+  * Either drop the gauge icon or make it align to the baseline and match stroke weight across the app.
+
+### 3) Tabs (Overview / Checklist)
+
+* The red underline is too thick and too long; it reads “web nav,” not “technical control.”
+
+  * Use a thinner indicator (1–2px), and keep it only under the word, not spanning half the bar.
+  * Increase letterspacing slightly for both tabs, and reduce the inactive tab contrast a hair. Current inactive is too faint compared to the divider line.
+
+### 4) Content card (“Vehicle Details”)
+
+* This card is where the app should feel “engineered.” It’s still reading like default shadcn.
+
+  * Reduce radius (keep it consistent everywhere).
+  * Kill any shadow; go border-first.
+  * Increase internal spacing slightly, but reduce vertical gaps between label/value pairs so it feels like a spec sheet, not a form.
+
+Suggested structure:
+
+* Labels: uppercase, small, muted, tighter tracking
+* Values: normal case, medium weight, consistent line height
+* Use a 2-column grid with consistent row rhythm
+
+### 5) Floating action button (the white circle with red glyph)
+
+* It’s materially styled (round, shadow, floating) in an otherwise flatter system.
+
+  * Either make it a true “tool button” (border-only, minimal/no shadow) or convert it into a secondary action inside the card.
+  * If it stays floating, anchor it to the grid: align it with the card’s right edge and sit it on a consistent vertical rule (right now it feels arbitrarily placed).
+
+### 6) Bottom nav integration
+
+* The bottom nav is fine, but the page background-to-nav transition still feels like separate layers.
+
+  * Ensure the page’s main background color continues behind the nav, and the nav itself uses either a top border line or a slightly different surface tone—choose one, not both.
+
+### 7) Consistency checks that will “jack up” perceived quality fast
+
+* One radius token across: header chips, cards, VIN module, buttons.
+* One border token across: same color/opacity for dividers and card borders.
+* Remove almost all shadows; keep one subtle shadow only if you want a single “primary” element (but don’t mix).
+* Align all content to a single left gutter; the hero/VIN module currently feels slightly off-grid relative to the content below.
+
+If you implement only two changes: thin + shorter tab indicator, and rebuild “Vehicle Details” as a border-first spec card with tighter typography rhythm.

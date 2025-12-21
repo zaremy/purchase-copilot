@@ -1,0 +1,149 @@
+LLM value should be communicated as provenance, not decoration.
+
+Audi/Porsche manuals don’t say “AI helped here.”
+They say: “Vehicle-specific advisory”, “Conditional check”, “Applies to vehicles with X.”
+
+That’s your aesthetic.
+
+The right mental model
+
+Think TSB / service bulletin overlays, not magic hints.
+
+The LLM is:
+
+not a character
+
+not an assistant popping in
+
+a silent augmentation layer that modifies the checklist
+
+Do NOT do these
+
+Sparkles
+
+Glowing icons
+
+Per-row emoji or novelty badges
+
+Page-level banners that repeat every visit
+
+Anything that reads as “chat UI leaking into checklist”
+
+Those all cheapen the engineering feel.
+
+The correct solution: a two-layer signal system
+Layer 1 — Page-level provenance (subtle, once)
+
+At the top of Checklist, near “INSPECTION STATUS”, add a single line of technical provenance.
+
+Example:
+
+TAILORED FOR THIS VEHICLE
+Based on model year, drivetrain, mileage, and known issues
+
+
+Styling:
+
+uppercase
+
+very small
+
+neutral-400
+
+no icon, or a tiny dot/diamond if needed
+
+This tells the user once:
+“This is not generic.”
+
+Then get out of the way.
+
+Layer 2 — Row-level specificity (where it matters)
+
+Only mark rows that were materially altered by the LLM.
+
+Not every row. Only the ones where:
+
+extra checks were added
+
+priority changed
+
+risk is higher for this car
+
+How to mark those rows (elegant)
+
+Use language + structure, not icons.
+
+Option A — Conditional subline (best)
+
+Under the row label, add a small secondary line:
+
+ENGINE
+• Inspect starter motor
+  Applies to 2013–2017 Accord; higher failure rate reported
+
+
+Styling:
+
+secondary line
+
+smaller
+
+muted
+
+indented slightly
+
+no icon
+
+This reads like a service manual note.
+
+Option B — Severity reordering (very powerful)
+
+LLM-augmented rows appear higher in their section.
+
+No badge.
+No sparkle.
+Just priority.
+
+Users feel the intelligence without being told.
+
+Optional: a single glyph, if you must
+
+If you absolutely want a visual affordance:
+
+Use a small hollow dot or diamond at the far right of the row
+
+Same color as secondary text
+
+No motion
+
+Tooltip or drill-in explains: “Vehicle-specific advisory”
+
+Never put it on the left. Left edge is for structure, not commentary.
+
+What NOT to mark
+
+Do not mark:
+
+generic checks
+
+unchanged rows
+
+everything “just because AI touched it”
+
+If everything is special, nothing is.
+
+Why this works
+
+Preserves engineering credibility
+
+Communicates value without shouting
+
+Feels like Audi/Porsche documentation
+
+Avoids “AI gimmick” backlash
+
+Scales cleanly as models get more complex
+
+One sentence to design against
+
+“This checklist quietly adapts to the vehicle, and only speaks up when that adaptation matters.”

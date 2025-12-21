@@ -1,0 +1,164 @@
+### Core decision
+
+* **Overview focus component:** VIN hero (identity artifact).
+* **Checklist focus component:** Progress hero (execution artifact).
+* Both occupy the same “focus slot” in the layout, but **Checklist’s focus slot must sit under the tabs** to avoid VIN-hero visual logic bleeding into workflow mode.
+
+---
+
+## Shared layout contract (keeps the app feeling premium)
+
+**Top to bottom**
+
+1. Top app bar (back + title)
+2. Vehicle title block (make it feel like a cover)
+3. Price / Mileage strip (thin, calm, informational)
+4. Tabs
+5. **Focus component (page-specific)**
+6. Page content
+
+**Why:** Tabs become the mode switch; the focus component becomes the “cover insert” for that mode.
+
+---
+
+## Premium “cover” typography (one system, two expressions)
+
+Stop relying on icons to create luxury. Do it with type, spacing, and restraint.
+
+### Type rules
+
+* **Title (ACCORD):** larger, slightly tracked, all caps OK if you commit everywhere.
+* **Subtitle (2016 HONDA):** smaller, uppercase, tighter tracking, muted.
+* Use **monospace only inside VIN**, nowhere else.
+* Use **numbers as design objects**: price, VIN, percent.
+
+### Spacing rules
+
+* Focus component gets **air**: generous top/bottom padding, no clutter inside.
+* Keep borders hairline. Kill shadows except one subtle, consistent elevation rule (or none).
+
+---
+
+# OVERVIEW TAB — VIN as the “cover insert”
+
+### Goal
+
+A single, ceremonious identity block that feels like a VIN plate or certificate panel.
+
+### VIN focus component spec
+
+**Placement**
+
+* Keep it where it is (above price) OR move it below tabs; either works.
+* If you want strict mode separation: keep VIN **only** on Overview, in the focus slot **below tabs**. That’s the cleanest system.
+
+**Treatment**
+
+* Surface: dark slab or dark outline panel on light background (choose one and lock it).
+* Label: “VEHICLE IDENTIFICATION NUMBER” as small uppercase with tight tracking.
+* VIN: monospace, centered, high-contrast.
+
+**Typography**
+
+* Label: 11–12px, uppercase, tracking wide, muted.
+* VIN: 18–20px monospace, tracking slightly increased, strong contrast.
+
+**Finish**
+
+* No inner card inside a card.
+* No iconography.
+* If you keep it dark: add a very subtle border (not shadow). The premium effect comes from silence + precision.
+
+### What to remove on Overview
+
+* Progress UI. No percent. No bar. No “inspection” language.
+* Avoid CTA near VIN; it dilutes ceremony.
+
+---
+
+# CHECKLIST TAB — Progress bar as the “cover insert”
+
+### Goal
+
+Swap identity ceremony for execution ceremony: a precise, high-end “completion instrument.”
+
+### Where it goes
+
+* **Directly under tabs** (your instinct is correct).
+* This makes the mode switch immediate: tabs → instrument → work.
+
+### Progress focus component spec
+
+Do not make it look like a generic progress component. Make it look like an “inspection rail.”
+
+**Structure**
+
+1. Section label: “INSPECTION”
+2. Completion number: “93%” (large, typographic)
+3. Progress rail: thin bar
+4. Secondary action: “VIEW DOSSIER” appears at threshold, aligned to the rail (not floating elsewhere)
+
+**Typography**
+
+* “INSPECTION”: 11–12px uppercase, tracking wide, muted.
+* “93%”: 28–34px, medium weight, tight tracking (let the number be the hero).
+* “complete” (optional): tiny muted text, not necessary if the number is clear.
+* “VIEW DOSSIER”: same style as tabs (uppercase, tracked), but muted until enabled.
+
+**Rail**
+
+* Height: 2px (max 3px).
+* Background rail: hairline gray.
+* Fill: brand red, but slightly desaturated (avoid neon).
+* Endcaps: square (technical) or very slight radius—match global radius rule.
+
+**Behavior**
+
+* When threshold reached, “VIEW DOSSIER” appears as text button on the right of the header row, not below the bar.
+* The bar stays calm; the number carries the status.
+
+### What to remove on Checklist
+
+* The VIN slab entirely.
+* Any icon next to completion (gauges, checks) inside the focus component. The number + rail is enough.
+
+---
+
+## “Cover feel” upgrades you can apply immediately
+
+### 1) Vehicle title block as cover typography
+
+Right now it’s serviceable. Make it feel intentional:
+
+* Increase vertical spacing above/below the title.
+* Tighten tracking on “ACCORD” and reduce weight slightly.
+* Keep “2016 HONDA” small, muted, and rigid.
+
+### 2) Price/Mileage strip becomes a calm spec line
+
+* Reduce the visual weight of “PRICE” and “MILEAGE” labels.
+* Align the number baselines (price and mileage should feel like the same typographic family).
+* Keep icons out or make them hairline-consistent; they currently read as decorative.
+
+### 3) Tabs indicator refinement
+
+* Underline should be thinner and only under the word.
+* Active tab text: slightly stronger contrast; inactive: still legible.
+* This keeps focus on the hero component that follows.
+
+---
+
+## Summary: the reconciled system
+
+* Tabs define **mode**.
+* Focus component defines **page identity**.
+
+  * Overview: VIN plate (monospace ceremony).
+  * Checklist: progress instrument (numeric ceremony).
+* Premium feel comes from:
+
+  * one typographic system,
+  * fewer surfaces,
+  * deliberate spacing,
+  * numbers treated as primary visual elements,
+  * no “UI decoration” competing with the focus block.

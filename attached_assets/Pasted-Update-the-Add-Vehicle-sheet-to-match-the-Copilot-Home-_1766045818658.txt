@@ -1,0 +1,47 @@
+Update the Add Vehicle sheet to match the Copilot/Home/Detail “engineering manual” system and reduce visual noise.
+
+1. Dark control band + mode pills
+
+* In the dark masthead, replace the current kicker with: “COPILOT ADD” (small, uppercase, tracked, muted).
+* Add pill-style segmented control in the masthead (or directly under it, still in the dark band) as the primary mode switch:
+
+  * Pills: “COPILOT”, “SCAN”, “VIN”, “MANUAL”
+  * Inactive: transparent, muted text
+  * Active: white pill background, dark text
+  * No underline tabs anywhere.
+* Switching pills changes the content area below, but keeps the same sheet container and header.
+
+2. Remove redundant header in content area
+
+* Remove the “ASK COPILOT TO ADD” title/header entirely.
+* The page should not repeat the mode name in the light area. The pill already communicates the mode.
+
+3. Copilot mode content: fix the boxed textarea (main issue)
+
+* Replace the current boxed/outlined textarea card with a flat, integrated “technical input well” that feels like the Copilot chat input:
+
+  * No big outer field box, no extra inset panel.
+  * Use a single subtle hairline boundary (e.g., bottom rule or very light outline) instead of a full card.
+  * Background should match the light content surface (same warm off-white) so it feels embedded, not like a separate widget.
+  * Keep height roughly the same as now (do not shrink it), but reduce the perception of a “box”.
+  * Placeholder typography: smaller, muted, non-shouty (no large grey block). Keep instructions concise:
+    “Paste listing URL or describe the car.”
+  * Use monospace ONLY inside the input while typing URLs/VIN-like strings (optional), but default text can remain normal sans.
+* Keep “PROCESS WITH COPILOT” as the primary action: solid black, uppercase, tracked, no shadow.
+
+4. Secondary modes
+
+* SCAN mode: show the scan UI (camera placeholder) and a primary black action, but keep the same typographic system and spacing.
+* VIN mode: show a single-line VIN entry field + “DECODE” primary action.
+
+  * VIN input should use monospace and an engineering feel (single-rule field, not a big rounded input box).
+* MANUAL mode: show your manual form fields in the same spec-table alignment style used on Detail (label/value grid, hairline dividers).
+
+5. Layout + alignment rules (apply to all modes)
+
+* One light content surface below the dark band. No alternating backgrounds / striping.
+* Everything aligns to one left gutter.
+* Prefer hairline dividers over cards; avoid shadows.
+* Maintain consistent vertical rhythm (same spacing tokens as Detail page specs).
+
+Goal: The Add Vehicle sheet should feel like a single “Copilot console” with an iOS-style segmented mode control in the dark band, and the Copilot input area should no longer look like a generic boxed textarea.

@@ -1,0 +1,84 @@
+### What your UI is doing well (from the screenshot)
+
+* Clear hierarchy: dark “COPILOT” masthead, then a single “Active Dossiers” KPI card, then “Your Garage” list.
+* Restraint: mostly monochrome with one accent (red). That’s the right direction for an Audi-ish “technical” feel.
+
+### Where it’s visually breaking right now
+
+1. **Mixed radius language**
+
+   * Header is hard-edged; cards are soft-rounded; FAB is heavily rounded with a big shadow. That combination reads “generic mobile kit,” not “premium technical.”
+2. **Too many elevation cues**
+
+   * You have card borders + shadows + inset-looking separators. Pick one primary depth mechanic and make it consistent.
+3. **Card chrome isn’t controlled**
+
+   * The “Active Dossiers” card has extra corner artifacting (your earlier “quarter circle” note). That’s usually a radius mismatch between parent/child layers (background, border, shadow, pseudo-element) or an absolutely-positioned element clipping weirdly.
+
+### Use the style guide the safe way (so Replit + Tailwind doesn’t get weird)
+
+Your attached PDF is specifically about **logo usage** (color variants, protective zone, and background rules), not a full UI system. Treat it as: “one accent red, disciplined background, negative logo on dark, no noisy backgrounds.” 
+
+Concrete takeaways you can safely translate into UI tokens:
+
+* Prefer **white / aluminum-like neutrals**; avoid “random colored” surfaces. 
+* Use a **negative (white) mark on dark** when you go dark. 
+* Keep a **protective zone** (clear space) around the mark; apply that thinking to header spacing. 
+* Keep the accent **Audi red** constrained (don’t start tinting lots of components). 
+
+### Styling upgrades that won’t confuse Replit
+
+This is the high-signal path: **tokens → a few component variants → delete ad-hoc tweaks.** Keep everything inside Tailwind + shadcn patterns; avoid scattered CSS files.
+
+#### 1) Lock a small token set (Tailwind + CSS variables)
+
+* Background: `--bg` (white), `--bg-muted` (aluminum-ish light gray), `--bg-dark` (near-black)
+* Text: `--fg`, `--fg-muted`
+* Lines: `--stroke` (light border), `--stroke-strong`
+* Accent: `--accent` (the single red)
+
+Result: you can “jack up” the look by adjusting *tokens* once, without chasing 40 class strings.
+
+#### 2) Pick one corner system and enforce it
+
+Audi-like tends to read better with **low-radius**.
+
+* Set cards to something like `rounded-md` max.
+* Kill mixed radii inside cards: children should inherit rounding or be square.
+
+#### 3) Choose one depth model: border-first, shadow-second
+
+Recommended for “technical”:
+
+* Default cards: **border + flat**
+* Only primary KPI card: **subtle shadow**
+* List items: **no shadow**, just dividers
+
+#### 4) Fix the “quarter circle” artifact properly (most likely causes)
+
+Implement these in order (they’re deterministic):
+
+* Ensure the card root has `overflow-hidden` and the same `rounded-*` as its background layer.
+* If there’s a `::before/::after` highlight, remove it or set `border-radius: inherit`.
+* If the card uses `ring-*` + `shadow-*`, drop one. Rings often create corner artifacts on dark-on-light transitions.
+* If an icon/button is absolutely positioned in the corner, confirm it’s not extending beyond the radius and getting clipped strangely.
+
+#### 5) Make the “technical typography” consistent
+
+* Section headers (“YOUR GARAGE”, “ARCHIVED”): all-caps, tight tracking, muted foreground.
+* Data labels: small, uppercase.
+* Values: larger, normal case.
+* Reduce font variety; rely on weight + tracking.
+
+#### 6) Rework the FAB so it doesn’t fight the system
+
+Current FAB is very “Material.” For your direction:
+
+* Make it smaller, flatter, less glow.
+* Use border + minimal shadow.
+* Keep the red as an accent, not a neon beacon.
+
+### Net effect
+
+* Cleaner, more “engineered,” less app-template.
+* Changes are centralized (tokens + 3–5 component variants), so you won’t get into Replit “vibe-coded spaghetti.”

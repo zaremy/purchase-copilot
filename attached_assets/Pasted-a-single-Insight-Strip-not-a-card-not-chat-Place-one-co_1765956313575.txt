@@ -1,0 +1,117 @@
+a single Insight Strip (not a card, not chat)
+
+Place one compact insight strip between the comparison table and the action buttons.
+
+Purpose:
+
+Prove Copilot is adding analysis, not restating data
+
+Invite deeper discussion without forcing it
+
+This mirrors how Audi/Porsche manuals add notes under spec tables.
+
+Structure of the Insight Strip
+Header (very small, technical)
+COPILOT INSIGHT
+
+
+Uppercase
+
+Neutral-500
+
+Same typographic treatment as other section kickers
+
+Optional subline (even smaller):
+
+Based on price, mileage, model year, and inspection progress
+
+Insight content (1–2 sentences max)
+
+This is critical: no fluff, no adjectives, no hedging language.
+
+Example:
+
+The Accord shows significantly higher inspection coverage (93%) but carries moderate risk due to mileage and known 9th-gen issues.
+The Miata’s lower mileage reduces mechanical risk, but inspection coverage is incomplete.
+
+Rules:
+
+Declarative
+
+Comparative
+
+Reads like a technical conclusion, not advice
+
+No “you should” language
+
+Visual treatment
+
+Light background (same as page)
+
+Left hairline rule (same color as homepage cards or checklist advisories)
+
+No rounded corners
+
+No shadow
+
+Same left gutter as the table
+
+This makes it feel annotated, not inserted.
+
+How it connects to “Discuss with Copilot”
+
+Do not embed a chat preview here.
+
+Instead:
+
+Keep your existing “Discuss with Copilot” primary button
+
+Change the microcopy under it to reference the insight
+
+Example subtext under the button:
+
+Ask follow-up questions or challenge this comparison
+
+
+This creates a clean mental flow:
+data → insight → discussion
+
+What NOT to do
+
+No sparkles
+
+No assistant avatar
+
+No “AI says…” language
+
+No expandable accordion here
+
+No repeated insights per row
+
+That would cheapen the engineering tone.
+
+Optional refinement (high-end touch)
+
+If you want one subtle affordance without noise:
+
+Add a small mono tag at the end of the insight line:
+
+[ANALYSIS v1]
+
+
+or
+
+[MODEL-SPECIFIC]
+
+
+Very small. Very quiet. Very “internal tooling.”
+
+One-sentence design rule
+
+On Compare, Copilot speaks once, clearly, and technically—then waits for the user to engage.
+
+If you want next, I can:
+
+Draft 3–4 example insight templates
+
+Or help you decide when the insight should not appear (important for trust)

@@ -1,0 +1,123 @@
+Correct instinct. This fixes the stripe problem cleanly without touching typography weight.
+
+Here’s the **precise reconciliation**, no fluff.
+
+---
+
+## The real fix
+
+**Move the tabs into the dark focus area and make them pill-style.**
+This collapses multiple visual seams into one intentional “control band.”
+
+---
+
+## New page structure (lock this)
+
+### Dark focus region (single continuous block)
+
+1. Masthead
+2. Tabs (pill style)
+3. Focus component (VIN on Overview / Progress on Checklist)
+
+All three share:
+
+* Same dark background
+* No dividers between them
+* One visual mass
+
+This eliminates striping entirely.
+
+---
+
+## Tabs: pill-style, iOS logic (not Material)
+
+### Why this works
+
+* Pills are **controls**, not navigation bars
+* They belong in a dark control zone
+* They don’t demand a full-width underline or divider
+
+### Pill spec
+
+* Container: dark background (same as masthead)
+* Inactive pill:
+
+  * Transparent background
+  * Light text (muted)
+* Active pill:
+
+  * White background
+  * Dark text
+  * No shadow
+  * Subtle radius (iOS-style, not bubbly)
+
+No underline. No bar. No motion drama.
+
+Typography does the work.
+
+---
+
+## Overview tab behavior
+
+**Dark region contains:**
+
+* Masthead
+* Pills (Overview active)
+* VIN slab
+
+VIN slab stays heavy.
+Tabs now *frame* it instead of slicing above it.
+
+Then a **hard break** to light background for:
+
+* Vehicle title
+* Price / mileage
+* Specs
+
+One break. That’s it.
+
+---
+
+## Checklist tab behavior
+
+**Dark region contains:**
+
+* Masthead
+* Pills (Checklist active)
+* Progress focus (number + rail)
+
+VIN disappears entirely here.
+
+Then a **hard break** to light background for:
+
+* Checklist items
+* Sections
+
+Again: one break only.
+
+---
+
+## What this solves immediately
+
+* Eliminates horizontal striping
+* Removes the awkward “tabs floating in light space”
+* Makes tabs feel premium and intentional
+* Lets the slab keep its authority
+* Restores clear mode separation (identity vs execution)
+
+---
+
+## Do NOT do these
+
+* Don’t give pills shadows
+* Don’t add borders around the pill group
+* Don’t change background again below the focus component
+* Don’t reintroduce underlines
+
+---
+
+## One sentence rule to code against
+
+**Header + pills + focus component are one dark control surface; everything else is one light content surface.**
+
+If you implement exactly this, the layout will snap into place without further aesthetic churn.
