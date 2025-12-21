@@ -115,7 +115,30 @@ export function useUpdateVehicle() {
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Vehicle> }) =>
       updateVehicle(id, updates),
-    onSuccess: (_, variables) => {
+    onMutate: async ({ id, updates }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['vehicles', id] });
+      
+      // Snapshot previous value
+      const previousVehicle = queryClient.getQueryData<Vehicle>(['vehicles', id]);
+      
+      // Optimistically update
+      if (previousVehicle) {
+        queryClient.setQueryData<Vehicle>(['vehicles', id], {
+          ...previousVehicle,
+          ...updates,
+        });
+      }
+      
+      return { previousVehicle };
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousVehicle) {
+        queryClient.setQueryData(['vehicles', variables.id], context.previousVehicle);
+      }
+    },
+    onSettled: (_, __, variables) => {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       queryClient.invalidateQueries({ queryKey: ['vehicles', variables.id] });
     },

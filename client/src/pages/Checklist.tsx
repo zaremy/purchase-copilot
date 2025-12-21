@@ -1,7 +1,7 @@
 import { MobileLayout } from '@/components/MobileLayout';
 import { useVehicle, useUpdateVehicle } from '@/lib/api';
 import { useLocation, useRoute } from 'wouter';
-import { ArrowLeft, Check, X, HelpCircle, Camera, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, X, HelpCircle, Loader2 } from 'lucide-react';
 import { CHECKLIST_DATA } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -5,7 +5,7 @@ import { ArrowLeft, Share2, ShieldAlert, CheckCircle2, CircleDashed, ChevronRigh
 import { CHECKLIST_DATA } from '@/lib/data';
 import { Link } from 'wouter';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { EditVehicleSheet } from '@/components/EditVehicleSheet';
 import {
   DropdownMenu,
@@ -29,6 +29,14 @@ export default function CandidateDetail() {
   const [activeTab, setActiveTab] = useState<'overview' | 'checklist'>(initialTab);
   const [isIssuesExpanded, setIsIssuesExpanded] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
+
+  // Sync tab state when URL query param changes
+  useEffect(() => {
+    const tabFromUrl = queryParams.get('tab') === 'checklist' ? 'checklist' : 'overview';
+    if (tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [search]);
 
   const updateCandidate = (id: string, updates: any) => {
     updateVehicleMutation.mutate({ id, updates });
