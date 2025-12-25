@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -17,6 +17,7 @@ import Library from "@/pages/Library";
 import Profile from "@/pages/Profile";
 import Notifications from "@/pages/Notifications";
 import Privacy from "@/pages/Privacy";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Help from "@/pages/Help";
 import { Onboarding } from "@/components/Onboarding";
 import { useStore } from "@/lib/store";
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/settings/help" component={Help} />
       <Route path="/settings/presets" component={ChecklistPresets} />
       <Route path="/settings/presets/:id" component={EditPreset} />
+      <Route path="/privacy" component={PrivacyPolicy} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -44,8 +46,11 @@ function Router() {
 
 function App() {
   const { onboardingComplete } = useStore();
+  const [location] = useLocation();
 
-  if (!onboardingComplete) {
+  const isPublicRoute = location === '/privacy';
+
+  if (!onboardingComplete && !isPublicRoute) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
