@@ -118,8 +118,8 @@ export function Onboarding() {
                       <div className="absolute top-0 left-0 right-0 h-[1px] bg-neutral-800/25" />
                       
                       <div className="px-6 pt-8">
-                        <h1 className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-2">Setup Your Profile</h1>
-                        <p className="text-xs text-neutral-400">Just a few details to get started</p>
+                        <h1 className="text-2xl font-bold text-white tracking-tight mb-1">Setup Your Profile</h1>
+                        <p className="text-sm text-neutral-400">Just a few details to get started</p>
                       </div>
                     </div>
 
