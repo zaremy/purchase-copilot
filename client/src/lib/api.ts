@@ -1,4 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Capacitor } from '@capacitor/core';
+
+// When running as a native app, we need to use the full production URL
+// When running in web browser, relative URLs work fine
+const API_BASE_URL = Capacitor.isNativePlatform() 
+  ? 'https://pre-purchase-pal-yuriyozaremba.replit.app' 
+  : '';
 
 export interface Vehicle {
   id: string;
@@ -48,19 +55,19 @@ export interface CreateVehicleInput {
 }
 
 async function fetchVehicles(): Promise<Vehicle[]> {
-  const response = await fetch('/api/vehicles');
+  const response = await fetch(`${API_BASE_URL}/api/vehicles`);
   if (!response.ok) throw new Error('Failed to fetch vehicles');
   return response.json();
 }
 
 async function fetchVehicle(id: string): Promise<Vehicle> {
-  const response = await fetch(`/api/vehicles/${id}`);
+  const response = await fetch(`${API_BASE_URL}/api/vehicles/${id}`);
   if (!response.ok) throw new Error('Failed to fetch vehicle');
   return response.json();
 }
 
 async function createVehicle(vehicle: CreateVehicleInput): Promise<Vehicle> {
-  const response = await fetch('/api/vehicles', {
+  const response = await fetch(`${API_BASE_URL}/api/vehicles`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(vehicle),
@@ -70,7 +77,7 @@ async function createVehicle(vehicle: CreateVehicleInput): Promise<Vehicle> {
 }
 
 async function updateVehicle(id: string, updates: Partial<Vehicle>): Promise<Vehicle> {
-  const response = await fetch(`/api/vehicles/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/vehicles/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(updates),
@@ -80,7 +87,7 @@ async function updateVehicle(id: string, updates: Partial<Vehicle>): Promise<Veh
 }
 
 async function deleteVehicle(id: string): Promise<void> {
-  const response = await fetch(`/api/vehicles/${id}`, { method: 'DELETE' });
+  const response = await fetch(`${API_BASE_URL}/api/vehicles/${id}`, { method: 'DELETE' });
   if (!response.ok) throw new Error('Failed to delete vehicle');
 }
 

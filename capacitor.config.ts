@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.prepurchasepal.app',
+  appId: 'com.purchasecopilot.app',
   appName: 'Pre-Purchase Pal',
   webDir: 'dist/public',
   server: {
