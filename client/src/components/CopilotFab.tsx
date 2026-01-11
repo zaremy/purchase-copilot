@@ -224,7 +224,7 @@ export function CopilotFab({ hasNav = true }: CopilotFabProps) {
 
               {/* Input Area - Only show in Chat Mode */}
               {activeMode === 'chat' && (
-                <div className="bg-white px-6 py-4 border-t border-neutral-200 pb-12 shrink-0 z-10 relative">
+                <div className="bg-white px-6 py-4 border-t border-neutral-200 pb-safe shrink-0 z-10 relative">
                    <div className="flex items-center gap-4">
                       <input 
                         className="flex-1 bg-transparent text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none py-2"

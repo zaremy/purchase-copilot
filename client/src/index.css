@@ -49,13 +49,17 @@
 }
 
 @layer base {
+  html {
+    padding-top: env(safe-area-inset-top);
+    background-color: #0a0a0a;
+  }
   * {
     @apply border-border;
   }
   body {
     /* Audi aesthetic: White/Light Grey background, Black text */
-    @apply font-sans antialiased bg-neutral-100 text-foreground; 
-    overscroll-behavior-y: none; 
+    @apply font-sans antialiased bg-neutral-100 text-foreground;
+    overscroll-behavior-y: none;
   }
   
   ::-webkit-scrollbar {
@@ -68,10 +72,22 @@
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
+  .pb-safe-24 {
+    padding-bottom: max(58px, calc(env(safe-area-inset-bottom) + 24px));
+  }
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
-  
+
+  /* Sheet utilities */
+  .sheetFooter {
+    padding-bottom: max(44px, calc(env(safe-area-inset-bottom) + 24px));
+  }
+  .sheetScroll {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
   /* Technical Header utility */
   .font-tech {
     font-feature-settings: "ss01", "ss02"; /* Enable stylistic sets if available in Inter for clearer numbers/letters */

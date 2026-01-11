@@ -1,18 +1,32 @@
 import { MobileLayout } from '@/components/MobileLayout';
-import { useVehicle, useUpdateVehicle } from '@/lib/api';
+import { useLocalVehicle, useUpdateLocalVehicle } from '@/lib/localVehicles';
 import { useLocation, useRoute } from 'wouter';
-import { ArrowLeft, Check, X, HelpCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, X, HelpCircle } from 'lucide-react';
 import { CHECKLIST_DATA } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMemo } from 'react';
 
 export default function ChecklistSection() {
   const [, params] = useRoute('/candidate/:id/checklist/:section');
   const [, setLocation] = useLocation();
-  const { data: candidate, isLoading } = useVehicle(params?.id || '');
-  const updateVehicleMutation = useUpdateVehicle();
+  const id = params?.id || '';
+  const candidate = useLocalVehicle(id);
+  const updateVehicleMutation = useUpdateLocalVehicle();
+
+  // Crash-proof update wrapper
+  const commitUpdate = (payload: { id: string; updates: any }) => {
+    try {
+      if (typeof updateVehicleMutation === 'function') updateVehicleMutation(payload);
+      else if (updateVehicleMutation?.mutate) updateVehicleMutation.mutate(payload);
+      else throw new Error('useUpdateLocalVehicle returned unexpected shape');
+    } catch (e) {
+      console.error(e);
+    }
+  };
   
-  const section = decodeURIComponent(params?.section || '');
+  const section = useMemo(() => decodeURIComponent(params?.section || ''), [params?.section]);
+  const items = useMemo(() => CHECKLIST_DATA.filter(i => i.section === section), [section]);
   
   const setChecklistResponse = (candidateId: string, itemId: string, response: any) => {
     if (!candidate) return;
@@ -27,7 +41,7 @@ export default function ChecklistSection() {
     const fails = Object.values(newResponses).filter((r: any) => r.status === 'fail').length;
     const riskScore = Math.min(100, fails * 15);
     
-    updateVehicleMutation.mutate({
+    commitUpdate({
       id: candidateId,
       updates: {
         checklistResponses: newResponses,
@@ -37,26 +51,22 @@ export default function ChecklistSection() {
     });
   };
   
-  if (isLoading) {
+  if (!candidate) {
     return (
       <MobileLayout showNav={false} headerStyle="dark" header={<div />}>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
+        <div className="p-6">
+          <p className="text-sm text-neutral-600">Vehicle not found.</p>
         </div>
       </MobileLayout>
     );
   }
-  
-  if (!candidate) return null;
-
-  const items = CHECKLIST_DATA.filter(i => i.section === section);
 
   return (
     <MobileLayout
       showNav={false}
       headerStyle="dark"
       header={
-        <div className="flex justify-between items-center py-1">
+        <div className="flex justify-between items-center py-2 px-1">
           <button onClick={() => setLocation(`/candidate/${candidate.id}?tab=checklist`)} className="p-2 -ml-2 rounded-full hover:bg-neutral-800 transition-colors">
             <ArrowLeft className="w-6 h-6 text-white" />
           </button>
@@ -169,7 +179,7 @@ export default function ChecklistSection() {
               const fails = Object.values(responses).filter((r: any) => r.status === 'fail').length;
               const riskScore = Math.min(100, fails * 15);
               
-              updateVehicleMutation.mutate({
+              commitUpdate({
                 id: candidate.id,
                 updates: { completeness, riskScore },
               });

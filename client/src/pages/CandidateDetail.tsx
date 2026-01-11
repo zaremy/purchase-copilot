@@ -1,5 +1,5 @@
 import { MobileLayout } from '@/components/MobileLayout';
-import { useVehicle, useUpdateVehicle } from '@/lib/api';
+import { useLocalVehicle, useUpdateLocalVehicle } from '@/lib/localVehicles';
 import { useLocation, useRoute, useSearch } from 'wouter';
 import { ArrowLeft, Share2, ShieldAlert, CheckCircle2, CircleDashed, ChevronRight, Car, Truck, Bus, Bike, CarFront, Gauge, Loader2, ChevronDown, AlertTriangle } from 'lucide-react';
 import { CHECKLIST_DATA } from '@/lib/data';
@@ -19,8 +19,8 @@ import {
 export default function CandidateDetail() {
   const [, params] = useRoute('/candidate/:id');
   const [, setLocation] = useLocation();
-  const { data: candidate, isLoading } = useVehicle(params?.id || '');
-  const updateVehicleMutation = useUpdateVehicle();
+  const candidate = useLocalVehicle(params?.id || '');
+  const updateVehicleMutation = useUpdateLocalVehicle();
   
   const search = useSearch();
   const queryParams = new URLSearchParams(search);
@@ -39,18 +39,8 @@ export default function CandidateDetail() {
   }, [search]);
 
   const updateCandidate = (id: string, updates: any) => {
-    updateVehicleMutation.mutate({ id, updates });
+    updateVehicleMutation.mutateAsync({ id, updates });
   };
-
-  if (isLoading) {
-    return (
-      <MobileLayout showNav={true} headerStyle="dark" header={<div />}>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
-        </div>
-      </MobileLayout>
-    );
-  }
 
   if (!candidate) return null;
 
@@ -203,7 +193,7 @@ export default function CandidateDetail() {
       </div>
 
       {/* LIGHT CONTENT SURFACE */}
-      <div className="bg-white min-h-[500px]">
+      <div className="bg-white min-h-screen">
         
         {/* OVERVIEW CONTENT */}
         {activeTab === 'overview' && (

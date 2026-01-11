@@ -140,7 +140,7 @@ export function EditProfileSheet({ isOpen, onClose }: EditProfileSheetProps) {
               
             </div>
 
-            <div className="bg-white px-6 py-4 border-t border-neutral-200 pb-12 shrink-0">
+            <div className="bg-white px-6 py-4 border-t border-neutral-200 pb-safe shrink-0">
               <button
                 onClick={handleSubmit}
                 disabled={!isFormValid}

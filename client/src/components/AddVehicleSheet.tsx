@@ -1,7 +1,7 @@
 import { ArrowLeft, Loader2, Sparkles, ScanLine, Search, X, Camera, Keyboard, Binary, RefreshCw, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useCreateVehicle } from '@/lib/api';
+import { useCreateLocalVehicle } from '@/lib/localVehicles';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +21,7 @@ const AI_FEATURES_ENABLED = false;
 type AddMode = 'copilot' | 'vin' | 'manual';
 
 export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
-  const createVehicle = useCreateVehicle();
+  const createVehicle = useCreateLocalVehicle();
   const { toast } = useToast();
   
   const [activeMode, setActiveMode] = useState<AddMode>('manual');
@@ -32,7 +32,6 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
   
   // Manual entry form state
   const [manualForm, setManualForm] = useState({
-    vin: '',
     year: '',
     make: '',
     model: '',
@@ -50,6 +49,9 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
   // Error blink state for validation feedback
   const [blinkingFields, setBlinkingFields] = useState<Set<string>>(new Set());
   const [notesFocused, setNotesFocused] = useState(false);
+
+  // Validation for manual form
+  const isManualFormValid = manualForm.year.length === 4 && manualForm.make.trim() && manualForm.model.trim();
 
   const triggerBlink = (field: string) => {
     setBlinkingFields(prev => new Set(prev).add(field));
@@ -129,7 +131,6 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
       setAiState('loading');
       setActiveMode('manual'); // Reset mode on close
       setManualForm({
-        vin: '',
         year: '',
         make: '',
         model: '',
@@ -228,7 +229,7 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
     setLoading(true);
     
     const vehicleData = {
-      vin: manualForm.vin.toUpperCase(),
+      vin: `MANUAL-${Date.now()}`,  // Placeholder VIN for manual entries
       year: parseInt(manualForm.year),
       make: manualForm.make,
       model: manualForm.model,
@@ -281,7 +282,7 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
               />
             </div>
             
-            <div className="px-6 pb-8 pt-4 bg-gradient-to-t from-[#F5F3F0] via-[#F5F3F0] to-transparent shrink-0 z-10">
+            <div className="px-6 pb-safe pt-4 bg-gradient-to-t from-[#F5F3F0] via-[#F5F3F0] to-transparent shrink-0 z-10">
               <div className="flex justify-end mb-2">
                  <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{copilotInput.length} / 2400</span>
               </div>
@@ -337,7 +338,7 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
 
       case 'manual':
         return (
-          <div className="flex-1 overflow-y-auto px-6 py-8">
+          <div className="px-6 py-8">
             <div className="space-y-0 divide-y divide-neutral-200 border-t border-neutral-200">
              {/* Core Identity */}
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
@@ -345,79 +346,79 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
                   "text-[10px] font-bold uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900",
                   blinkingFields.has('year') ? "text-red-500" : "text-neutral-400"
                 )}>Year *</span>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   inputMode="numeric"
-                  placeholder="2020" 
+                  placeholder="2020"
                   value={manualForm.year}
                   onChange={(e) => handleYearChange(e.target.value)}
                   maxLength={4}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300 font-mono" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300 font-mono"
                   data-testid="input-manual-year"
                 />
              </div>
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900">Make *</span>
-                <input 
-                  type="text" 
-                  placeholder="Toyota" 
+                <input
+                  type="text"
+                  placeholder="Toyota"
                   value={manualForm.make}
                   onChange={(e) => setManualForm({...manualForm, make: e.target.value})}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300"
                   data-testid="input-manual-make"
                 />
              </div>
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900">Model *</span>
-                <input 
-                  type="text" 
-                  placeholder="Camry" 
+                <input
+                  type="text"
+                  placeholder="Camry"
                   value={manualForm.model}
                   onChange={(e) => setManualForm({...manualForm, model: e.target.value})}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300"
                   data-testid="input-manual-model"
                 />
              </div>
-             
+
              {/* Valuation */}
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className={cn(
                   "text-[10px] font-bold uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900",
                   blinkingFields.has('price') ? "text-red-500" : "text-neutral-400"
                 )}>Price</span>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   inputMode="numeric"
-                  placeholder="0" 
+                  placeholder="0"
                   value={manualForm.price}
                   onChange={(e) => handlePriceChange(e.target.value)}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300 font-mono" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300 font-mono"
                   data-testid="input-manual-price"
                 />
              </div>
-             
+
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className={cn(
                   "text-[10px] font-bold uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900",
                   blinkingFields.has('mileage') ? "text-red-500" : "text-neutral-400"
                 )}>Mileage</span>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   inputMode="numeric"
-                  placeholder="0" 
+                  placeholder="0"
                   value={manualForm.mileage}
                   onChange={(e) => handleMileageChange(e.target.value)}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300 font-mono" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300 font-mono"
                   data-testid="input-manual-mileage"
                 />
              </div>
 
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900">Title</span>
-                <select 
+                <select
                   value={manualForm.titleStatus}
                   onChange={(e) => setManualForm({...manualForm, titleStatus: e.target.value})}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none appearance-none cursor-pointer" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none appearance-none cursor-pointer"
                   data-testid="select-manual-title"
                 >
                   <option value="" className="text-neutral-300">Select...</option>
@@ -430,43 +431,43 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
              {/* Specs */}
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900">Trim</span>
-                <input 
-                  type="text" 
-                  placeholder="e.g. XLE" 
+                <input
+                  type="text"
+                  placeholder="e.g. XLE"
                   value={manualForm.trim}
                   onChange={(e) => setManualForm({...manualForm, trim: e.target.value})}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300"
                   data-testid="input-manual-trim"
                 />
              </div>
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900">Color</span>
-                <input 
-                  type="text" 
-                  placeholder="e.g. Silver" 
+                <input
+                  type="text"
+                  placeholder="e.g. Silver"
                   value={manualForm.color}
                   onChange={(e) => setManualForm({...manualForm, color: e.target.value})}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300"
                   data-testid="input-manual-color"
                 />
              </div>
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900">Engine</span>
-                <input 
-                  type="text" 
-                  placeholder="e.g. 2.0L I4" 
+                <input
+                  type="text"
+                  placeholder="e.g. 2.0L I4"
                   value={manualForm.engine}
                   onChange={(e) => setManualForm({...manualForm, engine: e.target.value})}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300"
                   data-testid="input-manual-engine"
                 />
              </div>
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900">Transmission</span>
-                <select 
+                <select
                   value={manualForm.transmission}
                   onChange={(e) => setManualForm({...manualForm, transmission: e.target.value})}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none appearance-none cursor-pointer" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none appearance-none cursor-pointer"
                   data-testid="select-manual-transmission"
                 >
                   <option value="">Select...</option>
@@ -477,10 +478,10 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
              </div>
              <div className="grid grid-cols-3 gap-4 py-4 items-baseline group focus-within:bg-neutral-50/50">
                 <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-left col-span-1 transition-colors group-focus-within:text-neutral-900">Drive</span>
-                <select 
+                <select
                   value={manualForm.drivetrain}
                   onChange={(e) => setManualForm({...manualForm, drivetrain: e.target.value})}
-                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none appearance-none cursor-pointer" 
+                  className="col-span-2 bg-transparent text-sm font-medium text-neutral-900 focus:outline-none appearance-none cursor-pointer"
                   data-testid="select-manual-drivetrain"
                 >
                   <option value="">Select...</option>
@@ -501,7 +502,7 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
                     <span className="text-[9px] text-neutral-400 font-medium">{manualForm.notes.length}/500</span>
                   )}
                 </div>
-                <textarea 
+                <textarea
                   placeholder="Paste listing description or add notes..."
                   value={manualForm.notes}
                   onChange={(e) => handleNotesChange(e.target.value)}
@@ -510,17 +511,6 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
                   className="col-span-2 w-full bg-transparent text-sm font-medium text-neutral-900 focus:outline-none placeholder:text-neutral-300 min-h-[100px] resize-none font-sans"
                   data-testid="input-manual-notes"
                 />
-             </div>
-             
-             <div className="pt-6">
-               <button 
-                 onClick={handleManualSubmit}
-                 disabled={loading}
-                 className="w-full bg-neutral-900 text-white font-bold text-xs uppercase tracking-widest py-4 rounded-sm shadow-sm hover:bg-neutral-800 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                 data-testid="button-manual-submit"
-               >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add Vehicle"}
-               </button>
              </div>
             </div>
           </div>
@@ -531,7 +521,7 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="absolute inset-0 z-[100] flex justify-center items-end">
+        <div className="fixed inset-0 z-[100] flex justify-center items-end">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -539,7 +529,6 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
             onClick={onClose}
             className="absolute inset-0 bg-neutral-950/60 backdrop-blur-sm"
           />
-          
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: "0%" }}
@@ -553,18 +542,20 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
                 onClose();
               }
             }}
-            className="relative w-full h-[96%] bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800"
+            className="relative w-full h-[93%] bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800"
           >
             {/* DARK CONTROL SURFACE */}
-            <div className="bg-neutral-950 pt-3 pb-0 shrink-0 relative">
-               {/* Drag Handle */}
-               <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-neutral-700 rounded-full" />
-               
+            <div className="bg-neutral-950 pt-6 pb-0 shrink-0 relative touch-pan-y">
+               {/* Drag Handle - larger hit zone */}
+               <div className="absolute top-0 left-0 right-0 h-10 flex items-center justify-center">
+                 <div className="w-12 h-1.5 bg-neutral-700 rounded-full" />
+               </div>
+
                {/* Top Stroke for affordance */}
                <div className="absolute top-0 left-0 right-0 h-[1px] bg-neutral-800/25" />
 
                {/* Masthead */}
-               <div className="px-6 pt-8 pb-6 flex justify-between items-end">
+               <div className="px-6 pt-10 pb-6 flex justify-between items-end">
                   <div>
                      <h1 className="text-lg font-bold text-white uppercase tracking-wide">Add New Vehicle</h1>
                      {/* AI status hidden - will reactivate in future */}
@@ -619,10 +610,29 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
                </div>
             </div>
 
-            {/* LIGHT CONTENT SURFACE */}
-            <div className="flex-1 bg-[#F5F3F0] flex flex-col min-h-0">
+            {/* LIGHT CONTENT SURFACE - single scroll container */}
+            <div className="flex-1 bg-[#F5F3F0] min-h-0 overflow-y-auto sheetScroll">
                {renderContent()}
             </div>
+
+            {/* Sticky Footer for Manual Mode */}
+            {activeMode === 'manual' && (
+              <div className="bg-white px-6 py-4 border-t border-neutral-200 sheetFooter shrink-0">
+                <button
+                  onClick={handleManualSubmit}
+                  disabled={!isManualFormValid || loading}
+                  className={cn(
+                    "w-full font-bold text-xs uppercase tracking-widest py-4 rounded-sm shadow-sm transition-all flex items-center justify-center gap-2",
+                    isManualFormValid && !loading
+                      ? "bg-neutral-900 text-white hover:bg-neutral-800 active:scale-[0.99]"
+                      : "bg-neutral-200 text-neutral-400 cursor-not-allowed"
+                  )}
+                  data-testid="button-manual-submit"
+                >
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add Vehicle"}
+                </button>
+              </div>
+            )}
           </motion.div>
         </div>
       )}

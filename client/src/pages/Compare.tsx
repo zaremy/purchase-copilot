@@ -1,5 +1,5 @@
 import { MobileLayout } from '@/components/MobileLayout';
-import { useVehicles } from '@/lib/api';
+import { useLocalVehicles } from '@/lib/localVehicles';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Circle, AlertTriangle, ShieldCheck, Gauge, Calendar, DollarSign, X, Copy, ChevronDown, Check, Loader2 } from 'lucide-react';
@@ -38,7 +38,7 @@ const COMPARISON_OPTIONS = [
 const INITIAL_ROWS = ['price', 'mileage', 'year', 'riskScore', 'completeness'];
 
 export default function Compare() {
-  const { data: candidates = [], isLoading } = useVehicles();
+  const candidates = useLocalVehicles();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeRows, setActiveRows] = useState<string[]>(INITIAL_ROWS);
 
@@ -98,7 +98,7 @@ export default function Compare() {
         </div>
       }
     >
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-6 bg-[#F0EDE8] min-h-screen">
         
         {/* Selection Area */}
         {selectedIds.length < 2 && (
@@ -116,11 +116,7 @@ export default function Compare() {
         <div className="space-y-3">
           <h2 className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Your Garage</h2>
           
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
-            </div>
-          ) : candidates.length === 0 ? (
+          {candidates.length === 0 ? (
             <div className="text-center py-8 bg-neutral-100 rounded-sm border border-dashed border-neutral-300">
               <p className="text-xs text-neutral-500 font-medium uppercase tracking-wide">No vehicles in garage</p>
             </div>

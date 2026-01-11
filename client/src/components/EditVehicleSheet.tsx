@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUpdateVehicle } from '@/lib/api';
+import { useUpdateLocalVehicle } from '@/lib/localVehicles';
 import { useToast } from '@/hooks/use-toast';
 
 interface Vehicle {
@@ -29,7 +29,7 @@ interface EditVehicleSheetProps {
 }
 
 export function EditVehicleSheet({ isOpen, onClose, vehicle }: EditVehicleSheetProps) {
-  const updateVehicle = useUpdateVehicle();
+  const updateVehicle = useUpdateLocalVehicle();
   const { toast } = useToast();
   
   const [form, setForm] = useState({
@@ -119,7 +119,7 @@ export function EditVehicleSheet({ isOpen, onClose, vehicle }: EditVehicleSheetP
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="absolute inset-0 z-[100] flex justify-center items-end">
+        <div className="fixed inset-0 z-[100] flex justify-center items-end">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -140,14 +140,17 @@ export function EditVehicleSheet({ isOpen, onClose, vehicle }: EditVehicleSheetP
                 onClose();
               }
             }}
-            className="relative w-full h-[85%] bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800">
-              <div className="bg-neutral-950 pt-3 pb-6 shrink-0 relative">
-                <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-neutral-700 rounded-full" />
-                
-                <div className="px-6 pt-8 flex justify-between items-start">
+            className="relative w-full h-[93%] bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800">
+              <div className="bg-neutral-950 pt-6 pb-0 shrink-0 relative touch-pan-y">
+                {/* Drag Handle - larger hit zone */}
+                <div className="absolute top-0 left-0 right-0 h-10 flex items-center justify-center">
+                  <div className="w-12 h-1.5 bg-neutral-700 rounded-full" />
+                </div>
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-neutral-800/25" />
+
+                <div className="px-6 pt-10 pb-6 flex justify-between items-end">
                   <div>
-                    <h1 className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-2">Edit Vehicle</h1>
-                    <p className="text-xs text-neutral-400">Update vehicle information</p>
+                    <h1 className="text-lg font-bold text-white uppercase tracking-wide">Edit Vehicle</h1>
                   </div>
                   <button onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-neutral-800 transition-colors">
                     <X className="w-5 h-5 text-neutral-400" />
@@ -155,7 +158,7 @@ export function EditVehicleSheet({ isOpen, onClose, vehicle }: EditVehicleSheetP
                 </div>
               </div>
 
-              <div className="flex-1 bg-[#F5F3F0] overflow-y-auto px-6 py-6">
+              <div className="flex-1 min-h-0 bg-[#F5F3F0] overflow-y-auto sheetScroll px-6 py-6">
                 <div className="space-y-0 divide-y divide-neutral-200 border-t border-neutral-200 bg-white rounded-sm">
                   <div className="grid grid-cols-3 gap-4 py-3 px-4 items-baseline group focus-within:bg-neutral-50/50">
                     <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest transition-colors group-focus-within:text-neutral-900">Year *</span>
@@ -286,14 +289,14 @@ export function EditVehicleSheet({ isOpen, onClose, vehicle }: EditVehicleSheetP
                 </div>
               </div>
 
-              <div className="bg-white px-6 py-4 border-t border-neutral-200 pb-8 shrink-0">
+              <div className="bg-white px-6 py-4 border-t border-neutral-200 sheetFooter shrink-0">
                 <button
                   onClick={handleSubmit}
                   disabled={!isFormValid || updateVehicle.isPending}
                   className={cn(
                     "w-full font-bold text-xs uppercase tracking-widest py-4 rounded-sm shadow-sm transition-all",
                     isFormValid && !updateVehicle.isPending
-                      ? "bg-neutral-900 text-white hover:bg-neutral-800 active:scale-[0.99]" 
+                      ? "bg-neutral-900 text-white hover:bg-neutral-800 active:scale-[0.99]"
                       : "bg-neutral-200 text-neutral-400 cursor-not-allowed"
                   )}
                   data-testid="button-save-vehicle"

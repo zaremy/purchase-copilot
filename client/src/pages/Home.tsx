@@ -1,7 +1,7 @@
 import { MobileLayout } from '@/components/MobileLayout';
 import { CandidateCard } from '@/components/CandidateCard';
-import { useVehicles } from '@/lib/api';
-import { Plus, ScanLine, ChevronDown, Loader2 } from 'lucide-react';
+import { useLocalVehicles } from '@/lib/localVehicles';
+import { Plus, ScanLine, ChevronDown } from 'lucide-react';
 import { Link } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { AddVehicleSheet } from '@/components/AddVehicleSheet';
 
 export default function Home() {
-  const { data: vehicles = [], isLoading } = useVehicles();
+  const vehicles = useLocalVehicles();
   const [isArchivedOpen, setIsArchivedOpen] = useState(false);
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
 
@@ -28,8 +28,8 @@ export default function Home() {
       header={
         <div className="flex justify-between items-center py-1">
           <div className="flex items-center gap-3 pl-1">
-             <h1 className="text-lg tracking-tight text-white uppercase">
-               <span className="font-bold">Pre-Purchase</span><span className="font-normal">Pal</span>
+             <h1 className="text-lg tracking-tight text-white font-bold uppercase">
+               YOUR INSPECTIONS
              </h1>
           </div>
           <div className="flex gap-2">
@@ -66,17 +66,12 @@ export default function Home() {
       </div>
 
       {/* LIGHT CONTENT SURFACE */}
-      <div className="bg-[#F0EDE8] min-h-[500px] pt-6 px-4">
+      <div className="bg-[#F0EDE8] min-h-screen pt-6 px-4">
         <div>
           <div className="flex justify-between items-end mb-4 border-b border-neutral-300/50 pb-2">
-            <h3 className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Your Garage</h3>
+            <h3 className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">In Progress</h3>
           </div>
           
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
-              </div>
-            ) : (
             <div className="space-y-4">
               {activeCandidates.map((candidate) => (
                 <motion.div
@@ -89,9 +84,8 @@ export default function Home() {
                 </motion.div>
               ))}
             </div>
-            )}
           
-          {!isLoading && activeCandidates.length === 0 && (
+          {activeCandidates.length === 0 && (
              <div className="text-center py-12">
                 <ScanLine className="w-12 h-12 mx-auto mb-4 text-neutral-400" strokeWidth={1} />
                 <p className="text-sm text-neutral-600 leading-relaxed max-w-xs mx-auto mb-6">
