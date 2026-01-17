@@ -14,12 +14,10 @@ export default function ChecklistSection() {
   const candidate = useLocalVehicle(id);
   const updateVehicleMutation = useUpdateLocalVehicle();
 
-  // Crash-proof update wrapper
+  // Update wrapper
   const commitUpdate = (payload: { id: string; updates: any }) => {
     try {
-      if (typeof updateVehicleMutation === 'function') updateVehicleMutation(payload);
-      else if (updateVehicleMutation?.mutate) updateVehicleMutation.mutate(payload);
-      else throw new Error('useUpdateLocalVehicle returned unexpected shape');
+      updateVehicleMutation.mutate(payload);
     } catch (e) {
       console.error(e);
     }

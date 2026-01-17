@@ -1,0 +1,72 @@
+name: Task
+description: Outcome-first task with constraints and acceptance tests.
+title: "task: "
+labels: ["task"]
+body:
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Phase
+      options:
+        - Phase 2 — Accounts/Billing
+        - Phase 3 — AI
+        - Infra — Working Plane
+        - Bugfix
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: One or two sentences. What changes for the user/system when done?
+      placeholder: "Example: Users can create an account and see their subscription entitlement reflected in-app."
+    validations:
+      required: true
+
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: What is explicitly out of scope for this task?
+      placeholder: "- Not building full settings page\n- Not adding new billing UI beyond provider portal"
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints / Invariants
+      description: Rules this work must obey (security, platform, architecture, timeline).
+      placeholder: "- No secrets in repo\n- Do not log VIN/email/notes\n- Minimal backend surface"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Tests (Given/When/Then)
+      description: Concrete tests that prove this is done.
+      placeholder: "- Given ... When ... Then ...\n- Given ... When ... Then ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: file_targets
+    attributes:
+      label: File-level Targets
+      description: Expected files to add/modify (best guess; updated during implementation).
+      placeholder: "- backend/src/routes/...\n- app/src/...\n- docs/specs/..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: data_risk
+    attributes:
+      label: Data / Security Flags
+      options:
+        - label: Touches auth/identity
+        - label: Touches billing/entitlements
+        - label: Touches VIN/email/phone/notes (PII)
+        - label: Adds logging/telemetry
+        - label: Introduces webhook or background job

@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify required scripts exist
+        run: |
+          node -e "const p=require('./package.json'); const s=p.scripts||{}; const need=['typecheck','build']; const missing=need.filter(k=>!s[k]); if(missing.length){console.error('Missing npm scripts: '+missing.join(', ')); process.exit(1);} console.log('OK: required scripts present');"
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Tests (if present)
+        run: npm run test --if-present
