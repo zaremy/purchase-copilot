@@ -1,5 +1,10 @@
 // Vercel Express entry point
 // This file must NOT call listen() - Vercel handles request routing
+
+// CRITICAL: Sentry must be initialized first before any other imports
+import { initSentryServerless, flushSentry, Sentry } from "./sentry-serverless";
+initSentryServerless();
+
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { storage } from "../server/storage";
@@ -8,11 +13,23 @@ import { pool } from "../server/db";
 
 const app = express();
 
+// Middleware to flush Sentry before serverless function exits
+// MUST be first middleware to ensure it runs for all requests
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.on("finish", () => {
+    // Fire and forget - don't await, Vercel will wait for pending promises
+    flushSentry(2000);
+  });
+  next();
+});
+
 // Middleware
-app.use(cors({
-  origin: true,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -118,7 +135,10 @@ app.delete("/api/vehicles/:id", async (req, res) => {
   }
 });
 
-// Error handler
+// Sentry error handler MUST be after all routes
+Sentry.setupExpressErrorHandler(app);
+
+// Error handler (after Sentry)
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   const status = err.status || err.statusCode || 500;
   const message = err.message || "Internal Server Error";

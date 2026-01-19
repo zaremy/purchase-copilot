@@ -21,6 +21,7 @@ const serverConfigSchema = z.object({
 
   // Observability (optional but recommended)
   SENTRY_DSN: z.string().optional(),
+  SENTRY_RELEASE: z.string().optional(),
 });
 
 export type ServerConfig = z.infer<typeof serverConfigSchema>;
@@ -53,3 +54,6 @@ export const hasSupabase = Boolean(
 export const hasBilling = Boolean(
   config.REVENUECAT_API_KEY || config.STRIPE_SECRET_KEY
 );
+
+// Helper to check if Sentry is configured
+export const hasSentry = Boolean(config.SENTRY_DSN);

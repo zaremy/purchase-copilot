@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
+import * as Sentry from "@sentry/node";
 import { registerRoutes } from "./routes";
 import { createServer } from "http";
 
@@ -71,6 +72,10 @@ let routesInitialized = false;
 export async function initRoutes(): Promise<void> {
   if (routesInitialized) return;
   await registerRoutes(httpServer, app);
+
+  // Sentry error handler MUST be after routes but BEFORE custom error handler
+  Sentry.setupExpressErrorHandler(app);
+
   routesInitialized = true;
 }
 

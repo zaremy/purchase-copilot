@@ -1,3 +1,6 @@
+// CRITICAL: Sentry must be imported first before any other imports
+import "./instrument";
+
 import { app, httpServer, initRoutes, log } from "./app";
 import { serveStatic } from "./static";
 
