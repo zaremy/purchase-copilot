@@ -1,25 +1,39 @@
-import { defineConfig } from "vite";
+import { defineConfig, type UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { metaImagesPlugin } from "./vite-plugin-meta-images";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 
-export default defineConfig({
+export default defineConfig(async ({ mode }): Promise<UserConfig> => ({
   plugins: [
     react(),
     runtimeErrorOverlay(),
     tailwindcss(),
     metaImagesPlugin(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
+    ...(mode !== "production" && process.env.REPL_ID !== undefined
       ? [
           await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
+            m.cartographer()
           ),
           await import("@replit/vite-plugin-dev-banner").then((m) =>
-            m.devBanner(),
+            m.devBanner()
           ),
+        ]
+      : []),
+    // Sentry source maps upload (production builds with auth token only)
+    ...(mode === "production" && process.env.SENTRY_AUTH_TOKEN
+      ? [
+          sentryVitePlugin({
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            sourcemaps: {
+              // Delete source maps after upload to prevent exposure
+              filesToDeleteAfterUpload: ["./dist/public/**/*.map"],
+            },
+          }),
         ]
       : []),
   ],
@@ -40,6 +54,8 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Use hidden source maps in production (uploaded to Sentry, not served)
+    sourcemap: mode === "production" ? "hidden" : true,
   },
   server: {
     host: "0.0.0.0",
@@ -49,4 +65,4 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
-});
+}));
