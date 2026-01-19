@@ -1,14 +1,12 @@
-// Vercel serverless entry point
+// Vercel Express entry point
 // This file must NOT call listen() - Vercel handles request routing
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
-import { createServer } from "http";
 import { storage } from "../server/storage";
 import { insertVehicleSchema, updateVehicleSchema } from "../shared/schema";
 import { pool } from "../server/db";
 
 const app = express();
-const httpServer = createServer(app);
 
 // Middleware
 app.use(cors({
