@@ -1,5 +1,6 @@
 import { ArrowLeft, Loader2, Sparkles, ScanLine, Search, X, Camera, Keyboard, Binary, RefreshCw, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateLocalVehicle } from '@/lib/localVehicles';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -518,10 +519,10 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
     }
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex justify-center items-end">
+        <div className="fixed inset-0 z-[100]">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -542,7 +543,8 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
                 onClose();
               }
             }}
-            className="relative w-full h-[93%] bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800"
+            className="absolute left-0 right-0 bottom-0 bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800"
+            style={{ top: 'calc(env(safe-area-inset-top) + 20px)' }}
           >
             {/* DARK CONTROL SURFACE */}
             <div className="bg-neutral-950 pt-6 pb-0 shrink-0 relative touch-pan-y">
@@ -636,6 +638,7 @@ export function AddVehicleSheet({ isOpen, onClose }: AddVehicleSheetProps) {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

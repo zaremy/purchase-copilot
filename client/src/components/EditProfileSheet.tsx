@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Phone, MapPin, Check } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Check, X } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
@@ -44,10 +45,10 @@ export function EditProfileSheet({ isOpen, onClose }: EditProfileSheetProps) {
 
   const isFormValid = form.firstName.trim().length > 0;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="absolute inset-0 z-[100] flex justify-center items-end">
+        <div className="fixed inset-0 z-[100]">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -55,7 +56,7 @@ export function EditProfileSheet({ isOpen, onClose }: EditProfileSheetProps) {
             onClick={onClose}
             className="absolute inset-0 bg-neutral-950/60 backdrop-blur-sm"
           />
-          
+
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: "0%" }}
@@ -69,15 +70,23 @@ export function EditProfileSheet({ isOpen, onClose }: EditProfileSheetProps) {
                 onClose();
               }
             }}
-            className="relative w-full h-[85%] bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800"
+            className="absolute left-0 right-0 bottom-0 bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800"
+            style={{ top: 'calc(env(safe-area-inset-top) + 20px)' }}
           >
-            <div className="bg-neutral-950 pt-3 pb-6 shrink-0 relative">
-              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-neutral-700 rounded-full" />
+            <div className="bg-neutral-950 pt-6 pb-0 shrink-0 relative touch-pan-y">
+              {/* Drag Handle - larger hit zone */}
+              <div className="absolute top-0 left-0 right-0 h-10 flex items-center justify-center">
+                <div className="w-12 h-1.5 bg-neutral-700 rounded-full" />
+              </div>
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-neutral-800/25" />
-              
-              <div className="px-6 pt-8">
-                <h1 className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-2">Edit Profile</h1>
-                <p className="text-xs text-neutral-400">Update your information</p>
+
+              <div className="px-6 pt-10 pb-6 flex justify-between items-end">
+                <div>
+                  <h1 className="text-lg font-bold text-white uppercase tracking-wide">Edit Profile</h1>
+                </div>
+                <button onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-neutral-800 transition-colors">
+                  <X className="w-5 h-5 text-neutral-400" />
+                </button>
               </div>
             </div>
 
@@ -158,6 +167,7 @@ export function EditProfileSheet({ isOpen, onClose }: EditProfileSheetProps) {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

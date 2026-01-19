@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -116,10 +117,10 @@ export function EditVehicleSheet({ isOpen, onClose, vehicle }: EditVehicleSheetP
 
   const isFormValid = form.year && form.make && form.model;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex justify-center items-end">
+        <div className="fixed inset-0 z-[100]">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -140,7 +141,9 @@ export function EditVehicleSheet({ isOpen, onClose, vehicle }: EditVehicleSheetP
                 onClose();
               }
             }}
-            className="relative w-full h-[93%] bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800">
+            className="absolute left-0 right-0 bottom-0 bg-white shadow-2xl flex flex-col rounded-t-[20px] overflow-hidden border-t border-neutral-800"
+            style={{ top: 'calc(env(safe-area-inset-top) + 20px)' }}
+          >
               <div className="bg-neutral-950 pt-6 pb-0 shrink-0 relative touch-pan-y">
                 {/* Drag Handle - larger hit zone */}
                 <div className="absolute top-0 left-0 right-0 h-10 flex items-center justify-center">
@@ -307,6 +310,7 @@ export function EditVehicleSheet({ isOpen, onClose, vehicle }: EditVehicleSheetP
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
