@@ -22,6 +22,16 @@ app.get("/api/health", async (req, res) => {
   const startTime = Date.now();
   const checks: Record<string, { status: "ok" | "error"; latencyMs?: number; error?: string }> = {};
 
+  // Debug: show DATABASE_URL host (without password)
+  const dbUrl = process.env.DATABASE_URL || "NOT_SET";
+  let dbHost = "unknown";
+  try {
+    const url = new URL(dbUrl);
+    dbHost = url.hostname;
+  } catch {
+    dbHost = `invalid_url: ${dbUrl.substring(0, 30)}...`;
+  }
+
   try {
     const dbStart = Date.now();
     await pool.query("SELECT 1");
@@ -39,6 +49,7 @@ app.get("/api/health", async (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || "production",
     version: process.env.npm_package_version || "unknown",
+    dbHost, // Debug info
     checks,
     totalLatencyMs: Date.now() - startTime,
   };
