@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Capacitor } from '@capacitor/core';
+import { apiBaseUrl } from './config';
 
 // When running as a native app, we need to use the full production URL
 // When running in web browser, relative URLs work fine
-const API_BASE_URL = Capacitor.isNativePlatform() 
-  ? 'https://pre-purchase-pal-yuriyozaremba.replit.app' 
+const API_BASE_URL = Capacitor.isNativePlatform()
+  ? apiBaseUrl
   : '';
 
 export interface Vehicle {
