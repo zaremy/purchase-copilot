@@ -1,5 +1,5 @@
 import { build as esbuild } from "esbuild";
-import { build as viteBuild } from "vite";
+import { build as viteBuild, loadEnv } from "vite";
 import { rm, readFile, mkdir, cp, writeFile } from "fs/promises";
 
 // server deps to bundle to reduce openat(2) syscalls
@@ -33,10 +33,17 @@ const allowlist = [
 ];
 
 async function buildAll() {
+  // Load .env files - Vite's programmatic API doesn't auto-load them
+  const env = loadEnv("production", process.cwd(), "VITE_");
+  Object.assign(process.env, env);
+
   await rm("dist", { recursive: true, force: true });
   await rm(".vercel/output", { recursive: true, force: true });
 
   console.log("building client...");
+  if (process.env.VITE_API_URL) {
+    console.log(`  VITE_API_URL: ${process.env.VITE_API_URL}`);
+  }
   await viteBuild();
 
   console.log("building server...");
