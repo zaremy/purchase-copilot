@@ -2,11 +2,43 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertVehicleSchema, updateVehicleSchema } from "@shared/schema";
+import { pool } from "./db";
+import { config, isProduction } from "./config";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // GET /api/health - Health check endpoint
+  app.get("/api/health", async (req, res) => {
+    const startTime = Date.now();
+    const checks: Record<string, { status: "ok" | "error"; latencyMs?: number; error?: string }> = {};
+
+    // Database connectivity check
+    try {
+      const dbStart = Date.now();
+      await pool.query("SELECT 1");
+      checks.database = { status: "ok", latencyMs: Date.now() - dbStart };
+    } catch (error) {
+      checks.database = {
+        status: "error",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+
+    const allHealthy = Object.values(checks).every((c) => c.status === "ok");
+    const response = {
+      status: allHealthy ? "healthy" : "degraded",
+      timestamp: new Date().toISOString(),
+      environment: config.NODE_ENV,
+      version: process.env.npm_package_version || "unknown",
+      checks,
+      totalLatencyMs: Date.now() - startTime,
+    };
+
+    res.status(allHealthy ? 200 : 503).json(response);
+  });
+
   // GET /api/vehicles - Get all vehicles
   app.get("/api/vehicles", async (req, res) => {
     try {
