@@ -50,7 +50,6 @@
 
 @layer base {
   html {
-    padding-top: env(safe-area-inset-top);
     background-color: #0a0a0a;
   }
   * {
