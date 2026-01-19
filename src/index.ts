@@ -5,6 +5,7 @@
 import { initSentryServerless, flushSentry, Sentry } from "./sentry-serverless";
 initSentryServerless();
 
+import { waitUntil } from "@vercel/functions";
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { storage } from "../server/storage";
@@ -17,8 +18,8 @@ const app = express();
 // MUST be first middleware to ensure it runs for all requests
 app.use((_req: Request, res: Response, next: NextFunction) => {
   res.on("finish", () => {
-    // Fire and forget - don't await, Vercel will wait for pending promises
-    flushSentry(2000);
+    // waitUntil keeps function alive until Sentry events are flushed
+    waitUntil(flushSentry(2000));
   });
   next();
 });

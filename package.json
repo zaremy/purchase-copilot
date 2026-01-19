@@ -52,6 +52,7 @@
     "@tamagui/web": "^1.141.4",
     "@tanstack/react-query": "^5.60.5",
     "@types/cors": "^2.8.19",
+    "@vercel/functions": "^3.3.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
