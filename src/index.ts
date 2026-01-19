@@ -135,6 +135,16 @@ app.delete("/api/vehicles/:id", async (req, res) => {
   }
 });
 
+// GET /api/debug/sentry - Test endpoint to verify Sentry is working
+// Remove this after confirming Sentry captures errors
+app.get("/api/debug/sentry", (_req, res, next) => {
+  try {
+    throw new Error("Sentry test error from /api/debug/sentry");
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Sentry error handler MUST be after all routes
 Sentry.setupExpressErrorHandler(app);
 
