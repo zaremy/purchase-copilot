@@ -5,6 +5,7 @@
 import { initSentryServerless, flushSentry, Sentry } from "./sentry-serverless";
 initSentryServerless();
 
+import { waitUntil } from "@vercel/functions";
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { storage } from "../server/storage";
@@ -17,8 +18,8 @@ const app = express();
 // MUST be first middleware to ensure it runs for all requests
 app.use((_req: Request, res: Response, next: NextFunction) => {
   res.on("finish", () => {
-    // Fire and forget - don't await, Vercel will wait for pending promises
-    flushSentry(2000);
+    // waitUntil keeps function alive until Sentry events are flushed
+    waitUntil(flushSentry(2000));
   });
   next();
 });
@@ -133,6 +134,25 @@ app.delete("/api/vehicles/:id", async (req, res) => {
     console.error("Error deleting vehicle:", error);
     res.status(500).json({ error: "Failed to delete vehicle" });
   }
+});
+
+// GET /api/debug/sentry - Test endpoint to verify Sentry is working
+// Remove this after confirming Sentry captures errors
+app.get("/api/debug/sentry", (_req, res) => {
+  const error = new Error("Sentry test error from /api/debug/sentry");
+
+  // Explicitly capture - don't rely on setupExpressErrorHandler
+  Sentry.captureException(error);
+
+  // Return diagnostic info
+  res.status(500).json({
+    message: error.message,
+    sentryDsnSet: !!process.env.SENTRY_DSN,
+    // Don't expose full DSN - just show if it looks valid
+    sentryDsnPrefix: process.env.SENTRY_DSN?.substring(0, 20) || "NOT_SET",
+    eventSent: true,
+    note: "Check Sentry dashboard in ~1 minute",
+  });
 });
 
 // Sentry error handler MUST be after all routes

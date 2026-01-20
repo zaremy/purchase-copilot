@@ -39,6 +39,15 @@ export function initSentry(): void {
 
   initialized = true;
 
+  // Production test helper - DevTools console errors are sandboxed by browser
+  // so throwing errors there won't trigger Sentry. Use __testSentry() instead.
+  if (import.meta.env.PROD) {
+    (window as any).__testSentry = () => {
+      Sentry.captureException(new Error("Manual Sentry test"));
+      console.log("[Sentry] Test event sent - check dashboard in ~1 min");
+    };
+  }
+
   if (import.meta.env.DEV) {
     console.log("[Sentry] Initialized");
   }
