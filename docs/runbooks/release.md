@@ -1,5 +1,19 @@
 # Release & Rollback
 
+## Branch Protection
+
+**Ruleset:** `protect-main` (configured 2026-01-20)
+
+**Target:** `main` branch
+
+**Rules enabled:**
+- Require pull request before merging
+- Require status checks to pass (`ci` job)
+- Restrict deletions
+- Block force pushes
+
+**Location:** https://github.com/zaremy/purchase-copilot/settings/rules
+
 ## Versioning
 
 ### API/Server
@@ -98,10 +112,31 @@ npx drizzle-kit generate
 npx drizzle-kit push
 ```
 
-**Supabase backups:**
-- Automatic daily backups on Pro plan
-- Point-in-time recovery available
-- Contact support for restore
+**Supabase backups (Pro tier):**
+
+Daily scheduled backups + Point-in-Time Recovery (PITR) enabled.
+
+**Restore from scheduled backup:**
+1. Go to Supabase Dashboard → Database → Backups
+2. Find the backup to restore from (listed by date/time)
+3. Click "Restore" button
+4. Confirm in dialog (this overwrites current data)
+5. Wait for restore to complete
+6. Verify `/api/health` returns 200
+
+**Point-in-Time Recovery:**
+1. Go to Supabase Dashboard → Database → Backups → "Point in time" tab
+2. Select exact timestamp to restore to
+3. Confirm restore
+4. Verify health endpoint
+
+**Download backup (for local analysis):**
+1. Click "Download" on any backup
+2. File is a PostgreSQL dump (.sql)
+
+**Backup drill completed:** 2026-01-20 - Verified daily backup exists, restore UI accessible.
+
+**RPO (Recovery Point Objective):** 24 hours for scheduled backups, near-zero with PITR.
 
 ## Hotfix Protocol
 
