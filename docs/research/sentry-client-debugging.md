@@ -167,3 +167,75 @@ Sentry.init({
 - [Sentry JavaScript Troubleshooting](https://docs.sentry.io/platforms/javascript/troubleshooting/)
 - [Vite Environment Variables](https://vite.dev/guide/env-and-mode)
 - [Vercel + Vite Env Vars Discussion](https://github.com/vercel/vercel/discussions/6406)
+
+---
+
+## Sentry Serverless Debugging (2026-01-18)
+
+### Problem
+
+Server-side Sentry errors not appearing despite:
+- `SENTRY_DSN` set in Vercel environment variables
+- `Sentry.setupExpressErrorHandler(app)` configured
+- `/api/debug/sentry` endpoint returns error response
+- `waitUntil(flushSentry(2000))` implemented
+
+### Investigation Results
+
+**Verified working:**
+1. ✅ Client bundle has Sentry DSN baked in
+2. ✅ Server bundle reads `SENTRY_DSN` from `process.env` at runtime
+3. ✅ Vercel env vars set for all environments
+4. ✅ `waitUntil` properly wrapping `flushSentry`
+
+**Unknown:**
+1. ❓ Is Sentry actually initializing at runtime? (no log visibility)
+2. ❓ Is `setupExpressErrorHandler` capturing errors?
+3. ❓ Is the flush completing before function terminates?
+
+### Vercel Serverless Lifecycle
+
+**Key insight:** Vercel terminates serverless functions immediately after the response is sent. From [Vercel docs](https://vercel.com/docs/fluid-compute):
+> "Background processing: After fulfilling user requests, you can continue executing background tasks using `waitUntil`."
+
+**Correct pattern:**
+```typescript
+import { waitUntil } from '@vercel/functions';
+
+res.on("finish", () => {
+  waitUntil(flushSentry(2000));  // Vercel waits for this promise
+});
+```
+
+### Diagnostic Recommendations
+
+From external analysis (ChatGPT):
+
+1. **Install Vercel Sentry Integration** — Easiest path, handles runtime wiring automatically
+   - URL: https://vercel.com/marketplace/sentry
+
+2. **Use explicit `captureException`** — Don't rely solely on `setupExpressErrorHandler`
+
+3. **Add diagnostics to debug endpoint**:
+```typescript
+app.get("/api/debug/sentry", async (req, res) => {
+  const error = new Error("Sentry test error");
+  Sentry.captureException(error);
+  res.status(500).json({
+    message: error.message,
+    sentryDsnSet: !!process.env.SENTRY_DSN,
+    sentryDsnPrefix: process.env.SENTRY_DSN?.substring(0, 20) || "NOT_SET",
+  });
+});
+```
+
+4. **Symptom-to-cause map**:
+   - No events anywhere → init not running / DSN missing / blocked network
+   - Events in web, none in server → Server SDK not shipping/running
+   - Events but minified stacks → sourcemaps/release pipeline broken
+
+### Next Steps
+
+1. Modify `/api/debug/sentry` to use explicit `captureException` + return diagnostics
+2. If still fails: Install Vercel Sentry Integration
+3. If still fails: Check Sentry project settings for filters/quotas

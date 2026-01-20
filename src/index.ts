@@ -138,12 +138,21 @@ app.delete("/api/vehicles/:id", async (req, res) => {
 
 // GET /api/debug/sentry - Test endpoint to verify Sentry is working
 // Remove this after confirming Sentry captures errors
-app.get("/api/debug/sentry", (_req, res, next) => {
-  try {
-    throw new Error("Sentry test error from /api/debug/sentry");
-  } catch (error) {
-    next(error);
-  }
+app.get("/api/debug/sentry", (_req, res) => {
+  const error = new Error("Sentry test error from /api/debug/sentry");
+
+  // Explicitly capture - don't rely on setupExpressErrorHandler
+  Sentry.captureException(error);
+
+  // Return diagnostic info
+  res.status(500).json({
+    message: error.message,
+    sentryDsnSet: !!process.env.SENTRY_DSN,
+    // Don't expose full DSN - just show if it looks valid
+    sentryDsnPrefix: process.env.SENTRY_DSN?.substring(0, 20) || "NOT_SET",
+    eventSent: true,
+    note: "Check Sentry dashboard in ~1 minute",
+  });
 });
 
 // Sentry error handler MUST be after all routes
