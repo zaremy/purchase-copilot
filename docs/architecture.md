@@ -58,7 +58,7 @@ Pre-Purchase Pal — Mobile-first vehicle inspection app for used car buyers.
 ┌─────────────────────────────────────────────────────────────┐
 │                      Supabase                                │
 │  PostgreSQL + Auth + RLS                                    │
-│  Free tier → Pro at Phase 3                                 │
+│  Pro tier (daily backups + PITR)                            │
 └─────────────────────────────────────────────────────────────┘
 ```
 

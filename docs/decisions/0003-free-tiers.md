@@ -1,6 +1,6 @@
 # ADR 0003: Free Tiers Until Triggers
 
-**Status:** Accepted
+**Status:** Accepted (Supabase upgraded to Pro 2026-01-20)
 
 ## Context
 
@@ -14,11 +14,11 @@ Stay on free tiers for all services. Upgrade only when specific triggers are hit
 
 ### Upgrade Triggers
 
-| Service | Free Tier Limits | Upgrade Trigger |
-|---------|------------------|-----------------|
-| Supabase | 500MB storage, 50k MAU, pauses after 7d inactivity | Storage >400MB, MAU >40k, or users complain about pausing |
-| Vercel | 100GB bandwidth, 10s function timeout | Bandwidth >80GB or timeout issues |
-| RevenueCat | Free until $2.5k/mo revenue | Automatic (1% fee kicks in) |
+| Service | Tier | Limits | Upgrade Trigger |
+|---------|------|--------|-----------------|
+| Supabase | **Pro ($25/mo)** | 8GB storage, 100k MAU, daily backups, PITR | *Upgraded 2026-01-20* |
+| Vercel | Free | 100GB bandwidth, 10s function timeout | Bandwidth >80GB or timeout issues |
+| RevenueCat | Free | Free until $2.5k/mo revenue | Automatic (1% fee kicks in) |
 
 ### Monitoring
 
