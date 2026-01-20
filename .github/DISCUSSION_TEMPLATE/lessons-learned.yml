@@ -1,0 +1,95 @@
+title: "[LESSONS] "
+labels:
+  - worktime_learnings
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to capture tribal knowledge from completed work.
+        These learnings are reusable across future projects.
+
+  - type: input
+    id: phase
+    attributes:
+      label: Phase/Epic
+      description: Which phase or epic does this relate to?
+      placeholder: "Phase 2A: Infrastructure Migration"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What were you trying to accomplish?
+      placeholder: "Setting up Vercel deployment with Supabase database..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-worked
+    attributes:
+      label: What Worked Well
+      description: Approaches, tools, or patterns that saved time or prevented issues.
+      placeholder: |
+        - Using `waitUntil` for Sentry flush in serverless
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: gotchas
+    attributes:
+      label: Gotchas / Surprises
+      description: Things that didn't work as expected, or took longer than anticipated.
+      placeholder: |
+        - Vercel dashboard requires OAuth - can't automate with Playwright
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: time-estimates
+    attributes:
+      label: Actual vs Expected Effort
+      description: How long did things actually take? Include setup, debugging, and documentation.
+      placeholder: |
+        | Task | Expected | Actual | Notes |
+        |------|----------|--------|-------|
+        | Vercel setup | 30min | 15min | Smooth |
+    validations:
+      required: false
+
+  - type: textarea
+    id: reusable-patterns
+    attributes:
+      label: Reusable Patterns
+      description: Code snippets, configurations, or approaches worth copying to future projects.
+      placeholder: |
+        ```typescript
+        // Sentry serverless pattern
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: documentation-gaps
+    attributes:
+      label: Documentation Gaps Found
+      description: Official docs that were missing, outdated, or confusing.
+      placeholder: |
+        - Supabase: backup restore steps not clear in free vs pro docs
+    validations:
+      required: false
+
+  - type: textarea
+    id: tools-evaluated
+    attributes:
+      label: Tools/Services Evaluated
+      description: What did you consider? What did you choose and why?
+      placeholder: |
+        | Option | Chose? | Why |
+        |--------|--------|-----|
+        | Vercel | Yes | Free tier sufficient, good DX |
+    validations:
+      required: false
