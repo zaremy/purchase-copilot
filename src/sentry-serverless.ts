@@ -28,17 +28,21 @@ export function initSentryServerless(): void {
     environment: process.env.NODE_ENV || "production",
     release: process.env.SENTRY_RELEASE,
 
-    // Lower sample rate in production
+    // Enable debug mode to see what Sentry is doing
+    debug: true,
+
+    // Lower sample rate in production (for traces, not errors)
     tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
 
     // Scrub PII from all events before sending
     beforeSend(event) {
+      console.log("[Sentry] beforeSend called, event type:", event.exception ? "exception" : "other");
       return scrubObjectPII(event);
     },
   });
 
   initialized = true;
-  console.log("[Sentry] Serverless instrumentation initialized");
+  console.log("[Sentry] Serverless instrumentation initialized with DSN prefix:", dsn.substring(0, 20));
 }
 
 /**
