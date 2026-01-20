@@ -47,9 +47,20 @@ Uses standard App Store versioning:
 
 ## Rollback
 
-### API Rollback
+### API Rollback (Vercel)
 
-**Vercel:**
+**Via Dashboard (Recommended - Instant Rollback):**
+
+1. Go to https://vercel.com/dashboard
+2. Select the project (e.g., "purchase-copilot")
+3. Click "Deployments" tab
+4. Find the deployment to rollback TO (the previous working version)
+5. Click "..." menu on that row
+6. Click "Instant Rollback"
+7. Confirm in the dialog
+8. Verify `/api/health` returns 200
+
+**Via CLI:**
 ```bash
 # List recent deployments
 vercel ls
@@ -58,7 +69,9 @@ vercel ls
 vercel rollback [deployment-url]
 ```
 
-**Replit:**
+**Drill completed:** 2026-01-20 - Rollback and roll-forward verified, health endpoint green.
+
+**Replit (Legacy):**
 - Use git to revert commit on `main`
 - Replit will auto-deploy reverted state
 
