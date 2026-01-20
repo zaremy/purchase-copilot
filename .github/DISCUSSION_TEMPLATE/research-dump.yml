@@ -1,0 +1,76 @@
+title: "[RESEARCH] "
+labels:
+  - research_dump
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to dump raw research, notes, or findings before processing.
+        This is for capturing information quickly - organize later.
+
+  - type: input
+    id: topic
+    attributes:
+      label: Topic
+      description: What are you researching?
+      placeholder: "Supabase Auth patterns for mobile apps"
+    validations:
+      required: true
+
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Links, docs, repos, or articles you're pulling from.
+      placeholder: |
+        - https://supabase.com/docs/guides/auth
+        - https://github.com/example/repo
+    validations:
+      required: false
+
+  - type: textarea
+    id: raw-notes
+    attributes:
+      label: Raw Notes
+      description: Dump your findings here. Doesn't need to be organized.
+      placeholder: |
+        - Found that X works better than Y
+        - Code snippet: `const x = ...`
+        - Screenshot of dashboard setting
+    validations:
+      required: true
+
+  - type: textarea
+    id: key-findings
+    attributes:
+      label: Key Findings (Optional)
+      description: If you have time, summarize the important bits.
+      placeholder: |
+        1. Use PKCE flow for mobile
+        2. Refresh tokens expire after 7 days
+    validations:
+      required: false
+
+  - type: textarea
+    id: questions
+    attributes:
+      label: Open Questions
+      description: Things you still need to figure out.
+      placeholder: |
+        - How do we handle offline token refresh?
+        - What's the session timeout?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      description: Current state of this research
+      options:
+        - In Progress
+        - Needs Review
+        - Ready to Process
+        - Archived
+    validations:
+      required: true
