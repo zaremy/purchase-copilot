@@ -43,6 +43,10 @@ export async function signUpWithEmail(email: string, password: string) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      // Redirect back to the same origin (preview or production)
+      emailRedirectTo: window.location.origin,
+    },
   });
   if (error) throw error;
   return data;
