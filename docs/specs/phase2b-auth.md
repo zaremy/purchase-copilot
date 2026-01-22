@@ -1,6 +1,6 @@
 # Phase 2B: Authentication
 
-**Status:** Planned (after Phase 2A)
+**Status:** In Progress
 
 ## Outcome
 
@@ -12,15 +12,16 @@ Users can create accounts and sign in. Vehicle data is associated with user iden
 - AI features (Phase 3)
 - Social features
 - Vehicle sharing between users
+- Guest mode (must sign in to use app)
+- Google OAuth (MVP is Email + Apple only; Google added later)
 
 ## User Stories
 
 1. As a user, I can sign up with email/password
-2. As a user, I can sign in with Google
-3. As a user, I can sign in with Apple (required for App Store)
-4. As a user, my vehicles sync across devices
-5. As a user, I can sign out
-6. As a user, I can delete my account
+2. As a user, I can sign in with Apple (required for App Store)
+3. As a user, my vehicles sync across devices
+4. As a user, I can sign out
+5. As a user, I can delete my account (hard delete, no retention)
 
 ## Technical Approach
 
@@ -28,8 +29,7 @@ Users can create accounts and sign in. Vehicle data is associated with user iden
 
 Use Supabase Auth for identity management:
 - Email/password
-- Google OAuth
-- Apple OAuth
+- Apple OAuth (Google added later)
 
 ### Database Changes
 
@@ -118,20 +118,19 @@ Redirect URL: `prepurchasepal://auth-callback`
 
 ### Migration for Existing Users
 
-1. Existing local data stays in localStorage
-2. On first sign-in, prompt to migrate local data to cloud
-3. User chooses: migrate or start fresh
+**Decision:** Start fresh. No local data migration.
+
+New accounts start with empty vehicle list. Local data in localStorage remains until user clears it manually.
 
 ## Acceptance Tests
 
 - [ ] Email signup creates account
 - [ ] Email login works
-- [ ] Google OAuth works
 - [ ] Apple OAuth works (TestFlight required)
 - [ ] Vehicles sync across devices
-- [ ] RLS prevents accessing other users' data
+- [ ] RLS prevents accessing other users' data (zero rows, not error)
 - [ ] Sign out clears session
-- [ ] Delete account removes all user data
+- [ ] Delete account removes all user data (with receipt)
 
 ## Security Considerations
 
@@ -139,12 +138,26 @@ Redirect URL: `prepurchasepal://auth-callback`
 - Client uses anon key only
 - RLS policies prevent unauthorized access
 - No PII logged (email, phone)
+- `user_id` on INSERT set by database default (`auth.uid()`), not client-supplied
+- Account deletion returns audit receipt (counts, no PII)
+- Capacitor auth storage explicitly configured (not default web storage)
 
 ## Files Changed
 
 - New: `client/src/lib/supabase.ts`
 - New: `client/src/pages/Login.tsx`
-- New: `client/src/pages/Profile.tsx`
-- Modified: `shared/schema.ts` (add user_id)
-- Modified: `server/routes.ts` (auth middleware)
+- New: `server/middleware/auth.ts`
+- Modified: `client/src/pages/Profile.tsx` (wire to Supabase, add delete)
+- Modified: `client/src/App.tsx` (auth check, routing)
+- Modified: `client/src/lib/config.ts` (enable features.auth)
+- Modified: `client/src/lib/store.ts` (clear on sign out)
+- Modified: `shared/schema.ts` (add user_id, profiles table)
+- Modified: `server/routes.ts` (DELETE /api/account)
 - Modified: `ios/App/App/Info.plist` (deep links)
+- Modified: `.env.example` (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
+
+## Sub-Issues
+
+- #40 - 2B-1: Database schema (no RLS yet)
+- #41 - 2B-2: Client auth + Login UI + Enable RLS
+- #42 - 2B-3: Profile management + account deletion
