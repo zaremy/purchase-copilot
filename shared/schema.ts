@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, jsonb, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -19,6 +19,9 @@ export type User = typeof users.$inferSelect;
 
 export const vehicles = pgTable("vehicles", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  // user_id is nullable for now (PR1), will be required after RLS enabled (PR2)
+  // FK references auth.users(id) - managed by Supabase Auth
+  userId: uuid("user_id"),
   vin: text("vin").notNull(),
   year: integer("year").notNull(),
   make: text("make").notNull(),
@@ -53,3 +56,29 @@ export const updateVehicleSchema = insertVehicleSchema.partial();
 export type InsertVehicle = z.infer<typeof insertVehicleSchema>;
 export type UpdateVehicle = z.infer<typeof updateVehicleSchema>;
 export type Vehicle = typeof vehicles.$inferSelect;
+
+// Profiles table - auto-created by trigger on auth.users insert
+// id references auth.users(id) - managed by Supabase Auth
+export const profiles = pgTable("profiles", {
+  id: uuid("id").primaryKey(),
+  firstName: text("first_name"),
+  email: text("email"),
+  phone: text("phone"),
+  zipCode: text("zip_code"),
+  entitlements: jsonb("entitlements").notNull().default({}),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertProfileSchema = createInsertSchema(profiles).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateProfileSchema = insertProfileSchema.partial().omit({
+  id: true,
+});
+
+export type InsertProfile = z.infer<typeof insertProfileSchema>;
+export type UpdateProfile = z.infer<typeof updateProfileSchema>;
+export type Profile = typeof profiles.$inferSelect;
