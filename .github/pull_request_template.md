@@ -17,7 +17,6 @@
 ## Changes
 - Key files touched:
 - New contracts/endpoints/events:
-- [ ] Docs/playbook updated (or N/A)
 
 ## Data / PII
 - Data touched:

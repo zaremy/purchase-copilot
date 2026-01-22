@@ -14,31 +14,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check /docs contamination
-        run: |
-          echo "Checking for disallowed file types in /docs..."
-          DISALLOWED=$(find docs -type f \( \
-            -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" \
-            -o -name "*.json" -o -name "package.json" -o -name "package-lock.json" \
-          \) 2>/dev/null || true)
-          if [ -n "$DISALLOWED" ]; then
-            echo "ERROR: Disallowed file types found in /docs:"
-            echo "$DISALLOWED"
-            exit 1
-          fi
-
-          echo "Checking for runtime imports from /docs..."
-          IMPORTS=$(grep -rE "from ['\"].*docs/|import.*docs/|require\(['\"].*docs/" \
-            --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
-            src server client 2>/dev/null || true)
-          if [ -n "$IMPORTS" ]; then
-            echo "ERROR: Runtime code imports from /docs:"
-            echo "$IMPORTS"
-            exit 1
-          fi
-
-          echo "OK: /docs contamination check passed"
-
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:

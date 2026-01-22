@@ -2,8 +2,6 @@
 
 Mobile-first vehicle inspection app for used car buyers. Helps you evaluate vehicles systematically before purchase.
 
-**[View Product Playbook →](https://zaremy.github.io/purchase-copilot/playbook/)**
-
 ## Status
 
 - **Phase 1** (Complete): Manual inspection MVP - in App Store
