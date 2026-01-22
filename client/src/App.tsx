@@ -97,8 +97,9 @@ function App() {
     );
   }
 
-  // Show onboarding if not complete (only after auth check passes)
-  if (!onboardingComplete && !isPublicRoute) {
+  // Show onboarding ONLY if auth is disabled (legacy mode)
+  // When features.auth is true, Login component handles profile collection
+  if (!features.auth && !onboardingComplete && !isPublicRoute) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
