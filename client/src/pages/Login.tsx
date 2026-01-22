@@ -12,7 +12,7 @@ import {
 } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { Capacitor } from '@capacitor/core';
-import { ArrowLeft, Mail, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Mail, RefreshCw, User, Lock, Phone, MapPin } from 'lucide-react';
 
 type AuthMode = 'welcome' | 'signin' | 'signup' | 'check-email';
 
@@ -21,13 +21,12 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  // Form fields
+  // Form fields (required fields are controlled for validation)
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [zipCode, setZipCode] = useState('');
+  // phone and zip_code are uncontrolled - read from FormData at submit to capture autofill
 
   // Listen for auth state changes (session established after email confirm)
   useEffect(() => {
@@ -39,7 +38,7 @@ export default function Login() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Validation
@@ -60,12 +59,17 @@ export default function Login() {
       return;
     }
 
+    // Read optional fields from FormData to capture browser autofill values
+    const formData = new FormData(e.currentTarget);
+    const phoneValue = (formData.get('phone') as string)?.trim() || undefined;
+    const zipValue = (formData.get('zip_code') as string)?.trim() || undefined;
+
     setLoading(true);
     try {
       const metadata: SignUpMetadata = {
         first_name: firstName.trim(),
-        phone: phone.trim() || undefined,
-        zip_code: zipCode.trim() || undefined,
+        phone: phoneValue,
+        zip_code: zipValue,
       };
       await signUpWithEmail(email, password, metadata);
       setMode('check-email');
@@ -317,7 +321,7 @@ export default function Login() {
               </div>
             )}
 
-            {/* Optional fields (signup only) */}
+            {/* Optional fields (signup only) - uncontrolled to capture autofill */}
             {isSignUp && (
               <div className="pt-2 border-t border-neutral-100">
                 <p className="text-xs text-neutral-500 mb-3">Optional</p>
@@ -326,23 +330,21 @@ export default function Login() {
                     <Label htmlFor="phone" className="text-xs">Phone</Label>
                     <Input
                       id="phone"
+                      name="phone"
                       type="tel"
                       placeholder="(555) 123-4567"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
                       disabled={loading}
                       autoComplete="tel"
                       className="text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="zipCode" className="text-xs">ZIP Code</Label>
+                    <Label htmlFor="zip_code" className="text-xs">ZIP Code</Label>
                     <Input
-                      id="zipCode"
+                      id="zip_code"
+                      name="zip_code"
                       type="text"
                       placeholder="90210"
-                      value={zipCode}
-                      onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
                       maxLength={5}
                       disabled={loading}
                       autoComplete="postal-code"
