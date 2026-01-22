@@ -39,13 +39,27 @@ export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
 
 // Auth helper functions
 
-export async function signUpWithEmail(email: string, password: string) {
+// Profile metadata stored in auth.users.raw_user_meta_data
+// Synced to profiles table after first authenticated session (PR3)
+export interface SignUpMetadata {
+  first_name: string;
+  phone?: string;
+  zip_code?: string;
+}
+
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  metadata?: SignUpMetadata
+) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       // Redirect back to the same origin (preview or production)
       emailRedirectTo: window.location.origin,
+      // Store profile data in user metadata (no session needed)
+      data: metadata,
     },
   });
   if (error) throw error;
