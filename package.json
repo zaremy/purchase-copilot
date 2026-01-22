@@ -47,6 +47,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@sentry/node": "^10.34.0",
     "@sentry/react": "^10.34.0",
+    "@supabase/supabase-js": "^2.91.0",
     "@tamagui/config": "^1.141.4",
     "@tamagui/core": "^1.141.4",
     "@tamagui/web": "^1.141.4",
