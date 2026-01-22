@@ -1,0 +1,77 @@
+name: Playbook Tests
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'tests/playbook/**'
+      - 'playwright.config.ts'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'tests/playbook/**'
+      - 'playwright.config.ts'
+
+jobs:
+  playbook-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Setup Ruby for Jekyll
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: docs
+
+      - name: Create Gemfile if missing
+        run: |
+          if [ ! -f docs/Gemfile ]; then
+            cat > docs/Gemfile << 'EOF'
+          source "https://rubygems.org"
+          gem "jekyll", "~> 4.3"
+          gem "webrick"
+          EOF
+          fi
+
+      - name: Install Jekyll
+        working-directory: docs
+        run: bundle install
+
+      - name: Run Playwright tests
+        run: npm run test:playbook
+        env:
+          CI: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload screenshot diffs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: screenshot-diffs
+          path: test-results/
+          retention-days: 7

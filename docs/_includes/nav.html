@@ -1,0 +1,24 @@
+<nav class="nav">
+  {% for item in site.nav %}
+    {% if item.children %}
+      <div class="nav-group">
+        <span class="nav-group-title">{{ item.title }}</span>
+        <ul class="nav-list">
+          {% for child in item.children %}
+            <li>
+              <a href="{{ child.url | relative_url }}"
+                 class="nav-link {% if page.url == child.url %}active{% endif %}">
+                {{ child.title }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      <a href="{{ item.url | relative_url }}"
+         class="nav-link nav-link-top {% if page.url == item.url %}active{% endif %}">
+        {{ item.title }}
+      </a>
+    {% endif %}
+  {% endfor %}
+</nav>

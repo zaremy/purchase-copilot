@@ -16,6 +16,7 @@
 - No secrets in code. Use env vars. Do not commit `.env`.
 - Treat VIN, email, phone, free-text notes as sensitive. Do not log raw values.
 - Smallest viable change. No new architecture unless required by spec.
+- **`/docs` is NEVER part of runtime.** See "Playbook Separation" below.
 
 ## Build Workflow (enforced)
 - Any non-trivial work starts with @planner output (spec + acceptance tests).
@@ -46,6 +47,29 @@
 - Prefer explicit types and narrow interfaces.
 - Avoid "magic" global state; keep state transitions explicit.
 - Add minimal docs for any new contract in `docs/specs/` or `docs/decisions/`.
+
+## Playbook Separation (HARD GUARDRAIL)
+
+The `/docs` folder is the user-facing playbook (GitHub Pages) but NEVER part of app runtime.
+
+**Allowed in `/docs`:**
+- `*.md` (markdown)
+- `*.png`, `*.jpg`, `*.svg` (images)
+- `_config.yml` (Jekyll config)
+- `_layouts/*.html`, `_includes/*.html` (Jekyll partials)
+- `assets/styles.css` (single CSS file)
+
+**NOT allowed in `/docs`:**
+- JavaScript/TypeScript
+- npm dependencies or build tooling
+- Jekyll themes (own the CSS)
+- Anything importable by app code
+
+**CI Gate fails if:**
+- Disallowed file types in `/docs`
+- Runtime code (`/src`, `/server`, `/client`) imports from `/docs`
+
+**Maintenance rule:** PRs that change behavior/architecture update `/docs/playbook/` in the same PR.
 
 ## Agents
 - @planner: spec + acceptance tests + file targets.

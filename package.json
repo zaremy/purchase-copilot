@@ -10,7 +10,10 @@
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "typecheck": "tsc --noEmit",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "test:playbook": "playwright test",
+    "test:playbook:ui": "playwright test --ui",
+    "test:playbook:update": "playwright test --update-snapshots"
   },
   "dependencies": {
     "@capacitor/cli": "^8.0.0",
@@ -93,6 +96,8 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "serve": "^14.2.0",
     "@replit/vite-plugin-cartographer": "^0.4.4",
     "@replit/vite-plugin-dev-banner": "^0.1.1",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.4",
