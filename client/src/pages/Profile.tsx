@@ -1,14 +1,23 @@
 import { MobileLayout } from '@/components/MobileLayout';
-import { ArrowLeft, User, Mail, Phone, MapPin } from 'lucide-react';
-import { useLocation } from 'wouter';
+import { ArrowLeft, User, Mail, Phone, MapPin, LogOut } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { useState } from 'react';
+import { signOut } from '@/lib/supabase';
+import { features } from '@/lib/config';
 
 export default function Profile() {
-  const [, setLocation] = useLocation();
-  const { userProfile } = useStore();
+  const { userProfile, resetStore } = useStore();
   const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } finally {
+      resetStore();
+    }
+    // App.tsx auth gate auto-redirects to Login when session becomes null
+  };
 
   return (
     <MobileLayout
@@ -67,13 +76,24 @@ export default function Profile() {
           </div>
         </div>
 
-        <button 
+        <button
           onClick={() => setIsEditOpen(true)}
           className="w-full py-4 border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-900 font-bold text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm"
           data-testid="button-edit-profile"
         >
           Edit Profile
         </button>
+
+        {features.auth && (
+          <button
+            onClick={handleSignOut}
+            className="w-full py-4 border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-900 font-bold text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm flex items-center justify-center gap-2"
+            data-testid="button-sign-out"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </button>
+        )}
       </div>
     </MobileLayout>
   );

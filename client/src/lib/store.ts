@@ -37,6 +37,13 @@ export interface LocalVehicle {
 
 export type CreateVehicleInput = Omit<LocalVehicle, 'id' | 'createdAt' | 'updatedAt'>;
 
+// User-scoped state that gets cleared on sign out
+const USER_SCOPED_INITIAL = {
+  vehicles: [] as LocalVehicle[],
+  candidates: [] as Candidate[],
+  userProfile: null as UserProfile | null,
+};
+
 interface AppState {
   candidates: Candidate[];
   presets: ChecklistPreset[];
@@ -58,6 +65,7 @@ interface AppState {
   updateVehicle: (id: string, updates: Partial<LocalVehicle>) => void;
   deleteVehicle: (id: string) => void;
   setVehicleChecklistResponse: (vehicleId: string, itemId: string, response: ChecklistResponse) => void;
+  resetStore: () => void;
 }
 
 export const useStore = create<AppState>()(
@@ -166,6 +174,7 @@ export const useStore = create<AppState>()(
             };
           }),
         })),
+      resetStore: () => set(USER_SCOPED_INITIAL),
     }),
     {
       name: 'copilot-storage',
