@@ -28,6 +28,7 @@
 - Commands run are recorded in PR (typecheck/build/tests).
 - Risk + rollback noted.
 - Any data/PII touch is explicitly called out with redaction policy.
+- **Blocking items completed**: If status table shows "Blocking Merge", all such items must be done before merge. If user requests merge with incomplete blockers, explicitly ask for confirmation.
 
 ## Phase Boundaries
 ### Phase 2: Accounts/Billing
