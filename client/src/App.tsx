@@ -5,6 +5,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Spinner } from "@/components/ui/spinner";
+import { App as CapApp } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
 import NotFound from "@/pages/not-found";
 
 import Home from "@/pages/Home";
@@ -25,7 +27,7 @@ import Login from "@/pages/Login";
 import { Onboarding } from "@/components/Onboarding";
 import { useStore } from "@/lib/store";
 import { features } from "@/lib/config";
-import { onAuthStateChange, getSession, Session } from "@/lib/supabase";
+import { onAuthStateChange, getSession, supabase, Session } from "@/lib/supabase";
 
 function Router() {
   return (
@@ -72,6 +74,24 @@ function App() {
     });
 
     return () => subscription.unsubscribe();
+  }, []);
+
+  // Handle OAuth deep link callback on iOS (Apple Sign-In)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    let handle: { remove: () => void } | null = null;
+
+    CapApp.addListener('appUrlOpen', async ({ url }) => {
+      if (!url.includes('auth-callback')) return;
+
+      const { data, error } = await supabase.auth.exchangeCodeForSession(url);
+      if (!error && data?.session) {
+        setSession(data.session);
+      }
+    }).then((h) => { handle = h; });
+
+    return () => { handle?.remove(); };
   }, []);
 
   const isPublicRoute = location === '/privacy';
