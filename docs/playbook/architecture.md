@@ -18,7 +18,7 @@ A robust, offline-first React Native application backed by a scalable Node.js/Po
 
 {% include readiness.html %}
 
-<div id="phase1" class="phase-panel active" role="tabpanel">
+<div id="phase1" class="phase-panel active" role="tabpanel" markdown="1">
 
 ## Phase 1: MVP Architecture
 
@@ -107,7 +107,7 @@ Rejected handling direct vehicle payments to avoid money transmitter licensing r
 
 </div>
 
-<div id="phase2" class="phase-panel" role="tabpanel">
+<div id="phase2" class="phase-panel" role="tabpanel" markdown="1">
 
 ## Phase 2: Backend Foundation
 
@@ -162,7 +162,7 @@ Instead of a "big bang" release, we split the backend foundation into three dist
 
 </div>
 
-<div id="phase3" class="phase-panel" role="tabpanel">
+<div id="phase3" class="phase-panel" role="tabpanel" markdown="1">
 
 ## Phase 3: AI Integration
 
@@ -221,7 +221,7 @@ We cache generated checklists by Year/Make/Model. If a user inspects a "2015 Hon
 
 </div>
 
-<div id="phase4" class="phase-panel" role="tabpanel">
+<div id="phase4" class="phase-panel" role="tabpanel" markdown="1">
 
 ## Phase 4: Platform Scale
 

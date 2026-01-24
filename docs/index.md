@@ -79,10 +79,3 @@ Priced at $14.99 per vehicle (vs $200 PPI), making professional-grade inspection
 
 ### Platform Expansion
 Starting with consumers, expanding to mechanics (Pro Tier), and eventually specialty vehicles (RVs, Equipment).
-
----
-
-## Technical Docs
-
-- [Architecture Decisions (ADRs)]({{ site.baseurl }}/decisions/)
-- [Implementation Specs]({{ site.baseurl }}/specs/)
