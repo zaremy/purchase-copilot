@@ -1,0 +1,79 @@
+# System Readiness - synced from GitHub milestones
+# Update command: gh api repos/zaremy/purchase-copilot/milestones --jq '.[] | {title, closed_issues, open_issues}'
+# Last updated: 2026-01-23
+
+# App-wide phases (for homepage) - high-level view
+app_phases:
+  - id: phase1
+    label: "Phase 1"
+    closed: 2
+    total: 2
+    status: completed
+
+  - id: phase2
+    label: "Phase 2"
+    closed: 2
+    total: 3
+    status: current
+
+  - id: phase3
+    label: "Phase 3"
+    closed: 0
+    total: 1
+    status: pending
+
+  - id: phase4
+    label: "Phase 4"
+    closed: 0
+    total: 1
+    status: pending
+
+# Per-phase contextual items (for architecture tabs)
+phase_details:
+  phase1:
+    title: "Phase 1: MVP"
+    items:
+      - label: "Specs Defined"
+        status: completed
+      - label: "Design Complete"
+        status: completed
+      - label: "Dev Complete"
+        status: completed
+      - label: "QA Verified"
+        status: completed
+
+  phase2:
+    title: "Phase 2: Backend Foundation"
+    items:
+      - label: "2A Infrastructure"
+        status: completed
+        closed: 5
+        total: 5
+      - label: "2B Authentication"
+        status: completed
+        closed: 1
+        total: 1
+      - label: "2C Billing"
+        status: current
+        closed: 0
+        total: 1
+
+  phase3:
+    title: "Phase 3: AI Integration"
+    items:
+      - label: "LLM Integration"
+        status: pending
+      - label: "Caching Layer"
+        status: pending
+      - label: "Eval Harness"
+        status: pending
+
+  phase4:
+    title: "Phase 4: Platform Scale"
+    items:
+      - label: "Video Infrastructure"
+        status: pending
+      - label: "Enterprise API"
+        status: pending
+      - label: "Advanced AI"
+        status: pending

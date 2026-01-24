@@ -1,0 +1,15 @@
+title: Pre-Purchase Pal Playbook
+description: Product playbook and documentation for Pre-Purchase Pal
+url: "https://zaremy.github.io"
+baseurl: "/purchase-copilot"
+
+markdown: kramdown
+highlighter: rouge
+
+# Use pretty permalinks (directory-style URLs without .html)
+permalink: pretty
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
