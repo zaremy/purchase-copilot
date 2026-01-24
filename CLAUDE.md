@@ -142,6 +142,36 @@ Update the content when:
 - New architectural decisions are made
 - Cost projections change
 
+### Accuracy Rules for Architecture Docs
+
+**Document what's shipped, not what's planned.** Tech stack sections should reflect actual implementation, verified against the codebase:
+
+| Check | Source |
+|-------|--------|
+| State management | `client/src/lib/store.ts` (Zustand, not React Context) |
+| Auth client | `client/src/lib/supabase.ts` |
+| Feature flags | `client/src/lib/config.ts` |
+
+**Separate shipped vs pending.** When a sub-phase is partially complete, structure the section as:
+```markdown
+### Shipped: [Feature Name]
+- What's actually working
+
+### Pending: [Feature Name] (#issue)
+- What's not yet implemented
+```
+
+**Verify before writing.** Don't copy forward from old docs or assume patterns. Read the actual code files to confirm the current implementation.
+
+### Local Preview
+
+Jekyll is installed via Homebrew Ruby 4.0:
+```bash
+/opt/homebrew/lib/ruby/gems/4.0.0/bin/jekyll build --source docs --destination _site/purchase-copilot
+```
+
+The `_site/` folder is gitignored. GitHub Pages rebuilds on merge to main.
+
 ## Conventions
 - Prefer explicit types and narrow interfaces.
 - Avoid "magic" global state; keep state transitions explicit.
