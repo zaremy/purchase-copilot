@@ -181,3 +181,4 @@ The `_site/` folder is gitignored. GitHub Pages rebuilds on merge to main.
 - @planner: spec + acceptance tests + file targets.
 - @builder: implement + verify.
 - @reviewer: audit + block issues.
+- @docs: documentation updates, readiness tracking, ADRs, specs, lessons learned.
