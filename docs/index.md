@@ -13,15 +13,9 @@ Pre-Purchase Pal is your personal used car buying assistant. Inspect used cars a
 
 ---
 
-## System Readiness
+{% include readiness.html title="System Readiness" %}
 
-| Metric | Status |
-|--------|--------|
-| MVP Completion | 100% |
-| Design | Done |
-| Development | Done |
-| Content | Done |
-| Status | Live on App Store |
+[View Technical Architecture →]({{ site.baseurl }}/playbook/architecture)
 
 ---
 

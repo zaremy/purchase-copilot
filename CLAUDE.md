@@ -43,6 +43,92 @@
 - Schema-validated responses (no free-form).
 - Observability + eval harness.
 
+## Playbook Maintenance
+
+The playbook at `/docs` is the source of truth for product/architecture documentation. When completing work, update the playbook in the same PR.
+
+### Content Routing
+
+| Content Type | Destination |
+|-------------|-------------|
+| Phase progress updates | `docs/_data/readiness.yml` |
+| Architecture changes | `docs/playbook/architecture.md` (in appropriate phase tab) |
+| New specs/contracts | `docs/specs/` |
+| Architecture decisions | `docs/decisions/` |
+| Research dumps | GitHub Discussions (not `/docs`) |
+
+### Updating System Readiness
+
+File: `docs/_data/readiness.yml`
+
+**When a sub-phase completes** (e.g., 2C Billing ships):
+1. Update the sub-phase status from `current` to `completed`
+2. Set `closed` equal to `total`
+3. Move `current` status to the next incomplete sub-phase
+4. Update `app_phases` section:
+   - Increment `closed` count for the parent phase
+   - If all sub-phases done, set parent status to `completed` and move `current` to next phase
+
+**Example: Completing Phase 2C**
+```yaml
+# Before
+app_phases:
+  - id: phase2
+    label: "Phase 2"
+    closed: 2
+    total: 3
+    status: current
+
+phase_details:
+  phase2:
+    items:
+      - label: "2C Billing"
+        status: current
+        closed: 0
+        total: 1
+
+# After
+app_phases:
+  - id: phase2
+    label: "Phase 2"
+    closed: 3
+    total: 3
+    status: completed
+  - id: phase3
+    label: "Phase 3"
+    closed: 0
+    total: 1
+    status: current  # moved here
+
+phase_details:
+  phase2:
+    items:
+      - label: "2C Billing"
+        status: completed
+        closed: 1
+        total: 1
+```
+
+**Sync from GitHub milestones:**
+```bash
+gh api repos/zaremy/purchase-copilot/milestones --jq '.[] | {title, closed_issues, open_issues}'
+```
+
+### Status Values
+- `completed` - Work is done (green bar, 100%)
+- `current` - Active work (blue pulsing bar)
+- `pending` - Future work (gray bar, 0%)
+
+### Architecture Tab Content
+Each phase tab in `docs/playbook/architecture.md` contains:
+1. Contextual readiness bar (auto-rendered from `_data/readiness.yml`)
+2. Phase-specific technical content
+
+Update the content when:
+- Tech stack changes
+- New architectural decisions are made
+- Cost projections change
+
 ## Conventions
 - Prefer explicit types and narrow interfaces.
 - Avoid "magic" global state; keep state transitions explicit.

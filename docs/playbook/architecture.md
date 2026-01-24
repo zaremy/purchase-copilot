@@ -16,22 +16,15 @@ A robust, offline-first React Native application backed by a scalable Node.js/Po
   <button class="phase-tab" role="tab" aria-selected="false" data-tab="phase4">Phase 4</button>
 </div>
 
-{% include readiness.html %}
-
 <div id="phase1" class="phase-panel active" role="tabpanel" markdown="1">
+
+{% include readiness.html title="Phase 1 Progress" phases=site.data.readiness.phase_details.phase1.items %}
 
 ## Phase 1: MVP Architecture
 
 ### Focus: Reliability & Data Capture
 
 The MVP architecture prioritizes offline-first capabilities, robust photo storage, and structured data capture without the complexity of AI integration.
-
-### System Readiness: 100% Complete
-
-- Specs Defined
-- Design Complete
-- Dev Complete
-- QA Verified
 
 ---
 
@@ -109,6 +102,8 @@ Rejected handling direct vehicle payments to avoid money transmitter licensing r
 
 <div id="phase2" class="phase-panel" role="tabpanel" markdown="1">
 
+{% include readiness.html title="Phase 2 Progress" phases=site.data.readiness.phase_details.phase2.items %}
+
 ## Phase 2: Backend Foundation
 
 ### Strategic Transition Plan
@@ -163,6 +158,8 @@ Instead of a "big bang" release, we split the backend foundation into three dist
 </div>
 
 <div id="phase3" class="phase-panel" role="tabpanel" markdown="1">
+
+{% include readiness.html title="Phase 3 Progress" phases=site.data.readiness.phase_details.phase3.items %}
 
 ## Phase 3: AI Integration
 
@@ -222,6 +219,8 @@ We cache generated checklists by Year/Make/Model. If a user inspects a "2015 Hon
 </div>
 
 <div id="phase4" class="phase-panel" role="tabpanel" markdown="1">
+
+{% include readiness.html title="Phase 4 Progress" phases=site.data.readiness.phase_details.phase4.items %}
 
 ## Phase 4: Platform Scale
 

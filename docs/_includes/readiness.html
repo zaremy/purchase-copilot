@@ -1,25 +1,20 @@
+{% assign phases = include.phases | default: site.data.readiness.app_phases %}
+{% assign title = include.title | default: "System Readiness" %}
 <div class="readiness-bar">
-  <div class="readiness-title">System Readiness</div>
+  <div class="readiness-title">{{ title }}</div>
   <div class="readiness-phases">
-    <div class="readiness-phase completed">
-      <div class="readiness-phase-bar" style="--progress: 100%"></div>
-      <div class="readiness-phase-label">1 MVP</div>
+    {% for phase in phases %}
+    {% if phase.status == "completed" %}
+      {% assign progress = 100 %}
+    {% elsif phase.total and phase.total > 0 %}
+      {% assign progress = phase.closed | times: 100 | divided_by: phase.total %}
+    {% else %}
+      {% assign progress = 0 %}
+    {% endif %}
+    <div class="readiness-phase {{ phase.status }}">
+      <div class="readiness-phase-bar" style="--progress: {{ progress }}%"></div>
+      <div class="readiness-phase-label">{{ phase.label }}</div>
     </div>
-    <div class="readiness-phase completed">
-      <div class="readiness-phase-bar" style="--progress: 100%"></div>
-      <div class="readiness-phase-label">2A Infra</div>
-    </div>
-    <div class="readiness-phase completed">
-      <div class="readiness-phase-bar" style="--progress: 100%"></div>
-      <div class="readiness-phase-label">2B Auth</div>
-    </div>
-    <div class="readiness-phase current">
-      <div class="readiness-phase-bar" style="--progress: 0%"></div>
-      <div class="readiness-phase-label">2C Billing</div>
-    </div>
-    <div class="readiness-phase">
-      <div class="readiness-phase-bar" style="--progress: 0%"></div>
-      <div class="readiness-phase-label">3 AI</div>
-    </div>
+    {% endfor %}
   </div>
 </div>
