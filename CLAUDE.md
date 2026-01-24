@@ -47,6 +47,19 @@
 
 The playbook at `/docs` is the source of truth for product/architecture documentation. When completing work, update the playbook in the same PR.
 
+### Governance: GitHub Is Source of Truth
+
+**GitHub milestones and issues are the authoritative source for progress data.** The playbook must reflect GitHub, never the reverse.
+
+Before updating `readiness.yml`:
+1. Run `gh api repos/zaremy/purchase-copilot/milestones --jq '.[] | {title, closed_issues, open_issues}'`
+2. Verify issue assignments: `gh issue list --milestone "<milestone>" --state all --json number,title,state`
+3. If misalignment exists:
+   - Fix GitHub first (assign milestones, close/open issues as needed)
+   - Then update playbook to match
+
+**Never invent progress.** If an issue is open, the corresponding item is not complete.
+
 ### Content Routing
 
 | Content Type | Destination |

@@ -147,13 +147,33 @@ Mandatory for iOS App Store compliance. Abstracts Apple's complex StoreKit APIs.
 
 ---
 
+## Phase 2B Tech Stack (Authentication)
+
+### Shipped: Email/Password Auth
+- **Provider:** Supabase Auth
+- **Client:** `@supabase/supabase-js`
+- **State:** Zustand store with persist middleware
+- **UI:** Login (4 modes), Profile management, Sign Out
+
+### Pending: Apple Sign-In (#49)
+- **Provider:** Supabase Auth (Apple OAuth)
+- **iOS:** Native Sign in with Apple (ASAuthorizationController)
+- **Status:** In development
+
+### Security
+- **PKCE:** Enabled
+- **Session:** JWT (Supabase-managed)
+- **Logout:** Revoke tokens + clear local storage
+
+---
+
 ## Key Architecture Decisions
 
 ### Managed Integration Strategy
 We deliberately chose Vercel's native integrations for Supabase and Sentry over manual configuration. This ensures environment variables are automatically synced and deployments are atomically linked to database migrations and error tracking releases.
 
-### Phased Rollout (2A to 2B to 2C)
-Instead of a "big bang" release, we split the backend foundation into three distinct sub-phases: Infrastructure (Current), Authentication (Next), and Billing (Deferred). This isolates risk: we confirm the API works before adding user complexity, and confirm users work before adding payment complexity.
+### Phased Rollout (2A → 2B → 2C)
+Instead of a "big bang" release, we split the backend foundation into three distinct sub-phases: Infrastructure (Complete), Auth (Current), and Billing (Deferred). Google Sign-In was moved to Phase 4 to prioritize Apple Sign-In first (iOS App Store requirement). This isolates risk: we confirm the API works before adding user complexity, and confirm users work before adding payment complexity.
 
 </div>
 
