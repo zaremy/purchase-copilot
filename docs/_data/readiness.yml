@@ -12,20 +12,20 @@ app_phases:
 
   - id: phase2
     label: "Phase 2"
-    closed: 2
+    closed: 1
     total: 3
     status: current
 
   - id: phase3
     label: "Phase 3"
     closed: 0
-    total: 1
+    total: 3
     status: pending
 
   - id: phase4
     label: "Phase 4"
     closed: 0
-    total: 1
+    total: 4
     status: pending
 
 # Per-phase contextual items (for architecture tabs)
@@ -49,12 +49,12 @@ phase_details:
         status: completed
         closed: 5
         total: 5
-      - label: "2B Authentication"
-        status: completed
-        closed: 1
-        total: 1
-      - label: "2C Billing"
+      - label: "2B Auth"
         status: current
+        closed: 4
+        total: 5
+      - label: "2C Billing"
+        status: pending
         closed: 0
         total: 1
 
@@ -71,6 +71,8 @@ phase_details:
   phase4:
     title: "Phase 4: Platform Scale"
     items:
+      - label: "Google Sign-In"
+        status: pending
       - label: "Video Infrastructure"
         status: pending
       - label: "Enterprise API"
