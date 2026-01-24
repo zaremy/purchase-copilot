@@ -9,7 +9,16 @@ title: Technical Architecture
 
 A robust, offline-first React Native application backed by a scalable Node.js/PostgreSQL backend.
 
----
+<div class="phase-tabs" role="tablist">
+  <button class="phase-tab active" role="tab" aria-selected="true" data-tab="phase1">Phase 1</button>
+  <button class="phase-tab" role="tab" aria-selected="false" data-tab="phase2">Phase 2</button>
+  <button class="phase-tab" role="tab" aria-selected="false" data-tab="phase3">Phase 3</button>
+  <button class="phase-tab" role="tab" aria-selected="false" data-tab="phase4">Phase 4</button>
+</div>
+
+{% include readiness.html %}
+
+<div id="phase1" class="phase-panel active" role="tabpanel">
 
 ## Phase 1: MVP Architecture
 
@@ -96,7 +105,9 @@ Rejected due to lack of adoption by major DMVs and manufacturers. Centralized da
 ### Peer-to-Peer Payments
 Rejected handling direct vehicle payments to avoid money transmitter licensing requirements. We facilitate the deal, not the funds.
 
----
+</div>
+
+<div id="phase2" class="phase-panel" role="tabpanel">
 
 ## Phase 2: Backend Foundation
 
@@ -149,7 +160,9 @@ We deliberately chose Vercel's native integrations for Supabase and Sentry over 
 ### Phased Rollout (2A to 2B to 2C)
 Instead of a "big bang" release, we split the backend foundation into three distinct sub-phases: Infrastructure (Current), Authentication (Next), and Billing (Deferred). This isolates risk: we confirm the API works before adding user complexity, and confirm users work before adding payment complexity.
 
----
+</div>
+
+<div id="phase3" class="phase-panel" role="tabpanel">
 
 ## Phase 3: AI Integration
 
@@ -206,7 +219,9 @@ We strictly limit the LLM to structured JSON output based on specific fields. It
 ### Contextual Caching
 We cache generated checklists by Year/Make/Model. If a user inspects a "2015 Honda Civic", we check if we've already generated a checklist for that car. This reduces LLM costs by 80%.
 
----
+</div>
+
+<div id="phase4" class="phase-panel" role="tabpanel">
 
 ## Phase 4: Platform Scale
 
@@ -256,3 +271,30 @@ Forecasting component failure based on fleet data.
 - **Data:** Historical repair logs + Telemetry
 - **Model:** Time-series forecasting (Prophet / LSTM)
 - **Action:** Proactive alerts for "high risk" components
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tabs = document.querySelectorAll('.phase-tab');
+  const panels = document.querySelectorAll('.phase-panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-tab');
+
+      // Update tabs
+      tabs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      this.classList.add('active');
+      this.setAttribute('aria-selected', 'true');
+
+      // Update panels
+      panels.forEach(p => p.classList.remove('active'));
+      document.getElementById(targetId).classList.add('active');
+    });
+  });
+});
+</script>
