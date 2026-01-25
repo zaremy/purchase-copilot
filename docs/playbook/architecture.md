@@ -183,7 +183,7 @@ Everything ships as deterministic tools that an AI/agent can call. Build order: 
 
 ---
 
-## 3E: Billing Tools
+## 3A: Billing Tools
 
 Entitlement model first, paywall UI later.
 
@@ -225,7 +225,7 @@ Simple Stripe Checkout for web-based upgrades.
 
 ---
 
-## 3A: Reports Tool
+## 3D: Reports Tool
 
 Flagship paid output.
 
@@ -235,7 +235,7 @@ Flagship paid output.
 
 ---
 
-## 3D: Guidance Orchestrator
+## 3E: Guidance Orchestrator
 
 AI calls tools; no business logic in prompts.
 
@@ -274,6 +274,32 @@ Rejected as overkill. The inspection flow is linear and structured, not requirin
 {% include readiness.html title="Phase 4 Progress" phases=site.data.readiness.phase_details.phase4.items %}
 
 ## Phase 4: Distribution + GTM
+
+---
+
+## Paywall + Subscriptions
+
+RevenueCat SDK integration + native purchase UI. Connects payment collection to the entitlement model built in Phase 3A.
+
+### RevenueCat SDK (iOS)
+- **Package:** `purchases-capacitor`
+- **Init:** Configure with app-specific API key on app start
+- **Login:** `Purchases.logIn(supabaseUserId)` to link identities
+- **Offerings:** Fetch configured products from RevenueCat dashboard
+
+### Purchase Flow
+- **Paywall UI:** Display offerings, handle purchase
+- **Restore:** `Purchases.restorePurchases()` for device transfers
+- **Webhooks:** Already configured in Phase 3A (syncs entitlements)
+
+### App Store Connect
+- **Product:** Single SKU "Pro Upgrade" (monthly or annual)
+- **Sandbox:** Test with sandbox Apple ID
+- **Review:** Submit for App Store review
+
+### Web Fallback (Optional)
+- **Stripe Checkout:** For web-based upgrades
+- **Webhook:** Sync to Supabase via Edge Function
 
 ---
 
