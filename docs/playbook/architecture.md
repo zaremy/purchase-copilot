@@ -107,12 +107,6 @@ Use Supabase for both Authentication and PostgreSQL. It replaces your custom Exp
 - **Row Level Security (RLS):** Secure user data at the database level.
 - **Free Tier:** Generous limits (500MB db, 50k MAU) perfect for <1000 users.
 
-### RevenueCat (iOS IAP)
-Mandatory for iOS App Store compliance. Abstracts Apple's complex StoreKit APIs.
-
-- **Source of Truth:** RevenueCat manages subscription status, syncing to Supabase.
-- **Webhooks:** Sync entitlement updates to your Vercel backend.
-
 ---
 
 ## Phase 2A Tech Stack (Backend)
@@ -137,14 +131,13 @@ Mandatory for iOS App Store compliance. Abstracts Apple's complex StoreKit APIs.
 
 ---
 
-## Phase 2B Tech Stack (Authentication)
+## Phase 2B Tech Stack (Manual Auth)
 
-### Shipped: Email/Password + Apple Sign-In
+### Shipped: Email/Password
 - **Provider:** Supabase Auth
 - **Client:** `@supabase/supabase-js`
 - **State:** Zustand store with persist middleware
 - **UI:** Login (4 modes), Profile management, Sign Out
-- **Apple:** Native Sign in with Apple via `@capgo/capacitor-social-login`
 
 ### Security
 - **PKCE:** Enabled
@@ -153,13 +146,27 @@ Mandatory for iOS App Store compliance. Abstracts Apple's complex StoreKit APIs.
 
 ---
 
+## Phase 2C Tech Stack (Apple Auth)
+
+### Shipped: Sign in with Apple
+- **Provider:** Supabase Auth (Apple OAuth)
+- **Native:** `@capgo/capacitor-social-login`
+- **Flow:** Native ASAuthorizationController → `signInWithIdToken()`
+
+### Key Points
+- Native flow required (PKCE WebView loses code_verifier)
+- Profile hydration from `user_metadata`
+- 6-month secret rotation via `scripts/generate-apple-secret.mjs`
+
+---
+
 ## Key Architecture Decisions
 
 ### Managed Integration Strategy
 We deliberately chose Vercel's native integrations for Supabase and Sentry over manual configuration. This ensures environment variables are automatically synced and deployments are atomically linked to database migrations and error tracking releases.
 
-### Phased Rollout (2A → 2B)
-Instead of a "big bang" release, we split the backend foundation into distinct sub-phases: Infrastructure (Complete), Auth (Complete). Billing moved to Phase 3 as first tool. Google Sign-In moved to Phase 4 to prioritize Apple Sign-In first (iOS App Store requirement).
+### Phased Rollout (2A → 2B → 2C)
+Instead of a "big bang" release, we split the backend foundation into distinct sub-phases: Infrastructure (2A), Manual Auth (2B), Apple Auth (2C). Billing moved to Phase 3 as first tool. Google Sign-In moved to Phase 4 to prioritize Apple Sign-In first (iOS App Store requirement).
 
 </div>
 
@@ -176,6 +183,12 @@ Everything ships as deterministic tools that an AI/agent can call. Build order: 
 ## 3E: Billing Tools
 
 Entitlement model first, paywall UI later.
+
+### RevenueCat (iOS IAP)
+Mandatory for iOS App Store compliance. Abstracts Apple's complex StoreKit APIs.
+
+- **Source of Truth:** RevenueCat manages subscription status, syncing to Supabase.
+- **Webhooks:** Sync entitlement updates to your Vercel backend.
 
 ### In-App Purchases (iOS)
 Direct integration with Apple App Store via RevenueCat.
