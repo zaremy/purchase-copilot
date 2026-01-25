@@ -25,7 +25,7 @@ app_phases:
   - id: phase4
     label: "Phase 4"
     closed: 0
-    total: 3
+    total: 4
     status: pending
 
 # Per-phase contextual items (for architecture tabs)
@@ -85,6 +85,8 @@ phase_details:
   phase4:
     title: "Phase 4: Distribution + GTM"
     items:
+      - label: "Paywall + Subscriptions"
+        status: pending
       - label: "Welcome Experience"
         status: pending
       - label: "Google Sign-In"
