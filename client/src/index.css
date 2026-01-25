@@ -75,7 +75,7 @@
     padding-bottom: max(58px, calc(env(safe-area-inset-bottom) + 24px));
   }
   .pt-safe {
-    padding-top: env(safe-area-inset-top);
+    padding-top: calc(1rem + env(safe-area-inset-top));
   }
 
   /* Sheet utilities */

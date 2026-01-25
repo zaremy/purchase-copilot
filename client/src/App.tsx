@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Spinner } from "@/components/ui/spinner";
+import { Capacitor } from "@capacitor/core";
+import { SocialLogin } from "@capgo/capacitor-social-login";
 import NotFound from "@/pages/not-found";
 
 import Home from "@/pages/Home";
@@ -50,10 +52,11 @@ function Router() {
 }
 
 function App() {
-  const { onboardingComplete } = useStore();
-  const [location] = useLocation();
+  const { onboardingComplete, setUserProfile } = useStore();
+  const [location, setLocation] = useLocation();
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(features.auth);
+  const didInteractiveSignInRef = useRef(false);
 
   // Check auth state on mount and subscribe to changes
   useEffect(() => {
@@ -66,13 +69,55 @@ function App() {
       .finally(() => setAuthLoading(false));
 
     // Subscribe to auth changes
-    const { data: { subscription } } = onAuthStateChange((_event, s) => {
+    const { data: { subscription } } = onAuthStateChange((event, s) => {
       setSession(s);
       setAuthLoading(false);
+      // Mark as interactive sign-in when SIGNED_IN event fires
+      if (event === 'SIGNED_IN') {
+        didInteractiveSignInRef.current = true;
+      }
+      // Clear flag on sign out to avoid stale redirect
+      if (event === 'SIGNED_OUT') {
+        didInteractiveSignInRef.current = false;
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Initialize native social login plugin (for Apple Sign-In)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    SocialLogin.initialize({ apple: {} }).catch(console.error);
+  }, []);
+
+  // Redirect to Home after interactive sign-in
+  useEffect(() => {
+    if (didInteractiveSignInRef.current && session && !authLoading) {
+      didInteractiveSignInRef.current = false;
+      // Only redirect if not already on home to prevent redundant route writes
+      if (location !== '/') {
+        setLocation('/');
+      }
+    }
+  }, [session, authLoading, location, setLocation]);
+
+  // Hydrate userProfile from session metadata
+  useEffect(() => {
+    if (!session?.user) return;
+
+    const meta = session.user.user_metadata;
+    const fullName = meta?.full_name || meta?.name || '';
+    const firstName = fullName.split(' ')[0] || '';
+
+    setUserProfile({
+      firstName,
+      fullName,
+      email: session.user.email || '',
+      phone: meta?.phone || '',
+      zipCode: meta?.zip_code || '',
+    });
+  }, [session, setUserProfile]);
 
   const isPublicRoute = location === '/privacy';
 

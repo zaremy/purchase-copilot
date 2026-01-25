@@ -22,6 +22,12 @@
 - @builder implements only what the spec requires and proves acceptance with commands run.
 - @reviewer audits diff vs spec; blocks on security/PII/entitlement integrity issues.
 
+## Context Preservation on Compact
+When compacting mid-issue, update the GitHub issue with current status before compaction:
+1. Comment on linked issue with: current state, blockers, next steps
+2. Include any error messages or diagnostics discovered
+3. This ensures context survives session boundaries
+
 ## Definition of Done (per PR)
 - Linked issue exists.
 - Acceptance tests are listed in PR and mapped to evidence.
@@ -69,6 +75,55 @@ Before updating `readiness.yml`:
 | New specs/contracts | `docs/specs/` |
 | Architecture decisions | `docs/decisions/` |
 | Research dumps | GitHub Discussions (not `/docs`) |
+| Lessons learned | `docs/lessons/<phase>-<topic>.md` |
+
+### Lessons Learned
+
+**Location:** `docs/lessons/<phase>-<topic>.md` (e.g., `phase2b-apple-signin.md`)
+
+**When to write:**
+- After completing a phase or sub-phase
+- After encountering significant gotchas worth preserving
+
+**When to consult:**
+- Before starting work on auth, iOS, Capacitor, or Supabase features
+- When hitting cryptic errors in these domains
+
+**Template:**
+```markdown
+---
+layout: default
+title: "Lessons Learned: [Phase] [Topic]"
+---
+
+# Lessons Learned: [Phase] [Topic]
+
+**Date:** YYYY-MM-DD
+
+## Context
+Brief description of work completed.
+
+## What Worked Well
+- Item 1
+- Item 2
+
+## Gotchas / Surprises
+- **Issue**: Description
+- **Solution**: Fix
+
+## Effort (Optional)
+| Task | Expected | Actual | Notes |
+|------|----------|--------|-------|
+
+## Key Decisions
+- Decision 1 and rationale
+
+## Reusable Patterns
+Code snippets or patterns for future reference.
+
+## Maintenance Notes
+Scheduled tasks, expiring credentials, etc.
+```
 
 ### Updating System Readiness
 
