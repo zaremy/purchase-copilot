@@ -52,7 +52,7 @@ function Router() {
 }
 
 function App() {
-  const { onboardingComplete, setUserProfile } = useStore();
+  const { onboardingComplete, setUserProfile, setEntitlements, setEntitlementsLoading } = useStore();
   const [location, setLocation] = useLocation();
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(features.auth);
@@ -118,6 +118,42 @@ function App() {
       zipCode: meta?.zip_code || '',
     });
   }, [session, setUserProfile]);
+
+  // Fetch entitlements when session is available
+  useEffect(() => {
+    if (!session?.access_token) {
+      // Clear entitlements on sign out
+      setEntitlements(null);
+      return;
+    }
+
+    const fetchEntitlements = async () => {
+      setEntitlementsLoading(true);
+      try {
+        const response = await fetch('/api/entitlements', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setEntitlements(data);
+        } else {
+          // If entitlements fetch fails, set to null (will show as 'unknown')
+          console.warn('[App] Failed to fetch entitlements:', response.status);
+          setEntitlements(null);
+        }
+      } catch (error) {
+        console.error('[App] Error fetching entitlements:', error);
+        setEntitlements(null);
+      } finally {
+        setEntitlementsLoading(false);
+      }
+    };
+
+    fetchEntitlements();
+  }, [session?.access_token, setEntitlements, setEntitlementsLoading]);
 
   const isPublicRoute = location === '/privacy';
 
