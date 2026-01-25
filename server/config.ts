@@ -13,11 +13,11 @@ const serverConfigSchema = z.object({
   SUPABASE_URL: z.string().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
 
-  // Phase 2C: Billing (optional until Phase 2C)
+  // Phase 3E: Billing/Entitlements
   REVENUECAT_API_KEY: z.string().optional(),
-  REVENUECAT_WEBHOOK_SECRET: z.string().optional(),
-  STRIPE_SECRET_KEY: z.string().optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  REVENUECAT_WEBHOOK_AUTH_TOKEN: z.string().optional(), // Bearer token for webhook verification
+  ADMIN_SERVICE_KEY: z.string().optional(), // Service key for admin endpoints
+  ADMIN_ENDPOINTS_ENABLED: z.enum(["true", "false"]).optional().default("false"), // Disabled in prod by default
 
   // Observability (optional but recommended)
   SENTRY_DSN: z.string().optional(),
@@ -50,10 +50,14 @@ export const hasSupabase = Boolean(
   config.SUPABASE_URL && config.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Helper to check if billing is configured (Phase 2C)
-export const hasBilling = Boolean(
-  config.REVENUECAT_API_KEY || config.STRIPE_SECRET_KEY
-);
+// Helper to check if billing is configured (Phase 3E)
+export const hasBilling = Boolean(config.REVENUECAT_API_KEY);
 
 // Helper to check if Sentry is configured
 export const hasSentry = Boolean(config.SENTRY_DSN);
+
+// Helper to check if admin endpoints are enabled
+export const adminEndpointsEnabled = config.ADMIN_ENDPOINTS_ENABLED === "true";
+
+// Helper to check if billing webhook is configured
+export const hasWebhookAuth = Boolean(config.REVENUECAT_WEBHOOK_AUTH_TOKEN);

@@ -20,25 +20,88 @@
 
 ## Phase 3E: Billing Tools
 
+### Data Model
+
+**Entitlements JSONB Schema** (stored in `profiles.entitlements`):
+```typescript
+interface EntitlementsPayload {
+  version: 1;
+  pro: boolean;           // master flag from RevenueCat subscription
+  source: 'admin' | 'revenuecat';
+  updatedAt: string;      // ISO timestamp
+  expiresAt?: string;     // subscription expiration
+  reason?: string;        // admin note or event type
+  receiptId?: string;     // link to webhook_receipts or admin_receipts
+}
+```
+
+**Feature Derivation** (server-side only):
+- `pro=true` unlocks: reports, vin, photos, ai
+- Client receives derived features, not raw `pro` flag
+- Server resolves `pro` → feature flags; client never invents meaning
+
 ### entitlements.check
 - **Name:** `entitlements.check`
-- **Inputs:** `{ userId: string, feature: 'pro' | 'reports' | 'vin' | 'photos' | 'ai' }`
-- **Outputs:** `{ entitled: boolean, expiresAt?: string }`
-- **Errors:** `USER_NOT_FOUND`, `INVALID_FEATURE`
+- **Endpoint:** `GET /api/entitlements`
+- **Inputs:** None (uses authenticated user from token)
+- **Outputs:** `{ version: 1, features: { reports: boolean, vin: boolean, photos: boolean, ai: boolean }, updatedAt: string }`
+- **Errors:** `UNAUTHORIZED`, `PROFILE_NOT_FOUND`
 - **Side Effects:** None (read-only)
-- **Auth:** Authenticated user
+- **Auth:** Bearer token (authenticated user)
+- **Idempotent:** Yes
+- **Version:** 1.0
+- **Notes:** Returns derived features, not raw `pro` flag. Null-safe (returns defaults if entitlements missing).
+
+### entitlements.set
+- **Name:** `entitlements.set`
+- **Endpoint:** `POST /api/admin/entitlements/set`
+- **Inputs:** `{ userId: string, pro: boolean, reason: string }`
+- **Outputs:** `{ success: boolean, receiptId: string }`
+- **Errors:** `UNAUTHORIZED`, `USER_NOT_FOUND`, `ADMIN_DISABLED`
+- **Side Effects:** Updates `profiles.entitlements`, creates `admin_receipts` row
+- **Auth:** X-Admin-Key header (server-only service key)
+- **Security:** Disabled in production unless `ADMIN_ENDPOINTS_ENABLED=true`
+- **Idempotent:** Yes (same set = same result)
+- **Version:** 1.0
+
+### entitlements.revoke
+- **Name:** `entitlements.revoke`
+- **Endpoint:** `POST /api/admin/entitlements/revoke`
+- **Inputs:** `{ userId: string, reason: string }`
+- **Outputs:** `{ success: boolean, receiptId: string }`
+- **Errors:** `UNAUTHORIZED`, `USER_NOT_FOUND`, `ADMIN_DISABLED`
+- **Side Effects:** Updates `profiles.entitlements` (pro=false), creates `admin_receipts` row
+- **Auth:** X-Admin-Key header
+- **Security:** Disabled in production unless `ADMIN_ENDPOINTS_ENABLED=true`
+- **Idempotent:** Yes
+- **Version:** 1.0
+- **Notes:** Alias for `entitlements.set` with `pro=false`. Explicit revoke for audit clarity.
+
+### entitlements.audit.list
+- **Name:** `entitlements.audit.list`
+- **Endpoint:** `GET /api/admin/entitlements/audit?userId=<uuid>`
+- **Inputs:** `{ userId: string }`
+- **Outputs:** `{ receipts: Array<{ type: 'webhook' | 'admin', id: string, createdAt: string, ... }> }`
+- **Errors:** `UNAUTHORIZED`
+- **Side Effects:** None (read-only)
+- **Auth:** X-Admin-Key header
 - **Idempotent:** Yes
 - **Version:** 1.0
 
-### entitlements.grant
-- **Name:** `entitlements.grant`
-- **Inputs:** `{ userId: string, feature: string, expiresAt: string, source: 'revenuecat' | 'admin' }`
-- **Outputs:** `{ success: boolean, entitlementId: string }`
-- **Errors:** `USER_NOT_FOUND`, `INVALID_FEATURE`, `ALREADY_ENTITLED`
-- **Side Effects:** Creates entitlement record, audit event
-- **Auth:** Webhook signature or admin
-- **Idempotent:** Yes (same grant = no-op)
+### billing.webhook
+- **Name:** `billing.webhook`
+- **Endpoint:** `POST /api/billing/webhook`
+- **Inputs:** RevenueCat webhook payload
+- **Outputs:** `{ received: true, dedupe?: boolean, processed?: boolean }`
+- **Errors:** `INVALID_AUTH`
+- **Side Effects:**
+  1. Creates `webhook_receipts` row (idempotency via unique `event_id`)
+  2. Fetches canonical state from RevenueCat subscriber API
+  3. Updates `profiles.entitlements` from subscriber state
+- **Auth:** Authorization header (bearer token configured in RevenueCat dashboard)
+- **Idempotent:** Yes (duplicate events return `{ dedupe: true }`)
 - **Version:** 1.0
+- **Notes:** Uses INSERT-first transaction for concurrency safety. User ID resolved via `profiles.revenuecat_app_user_id` or `profiles.id`.
 
 ---
 
@@ -144,6 +207,10 @@
 |------|-------------|
 | `UNAUTHORIZED` | Missing or invalid auth token |
 | `FORBIDDEN` | Valid auth but insufficient entitlements |
+| `ADMIN_DISABLED` | Admin endpoints disabled in production |
+| `INVALID_AUTH` | Webhook authorization header invalid |
+| `PROFILE_NOT_FOUND` | User profile does not exist |
+| `USER_NOT_FOUND` | Specified user does not exist |
 | `RATE_LIMITED` | Too many requests, retry after X seconds |
 | `VALIDATION_ERROR` | Invalid input parameters |
 | `NOT_FOUND` | Resource does not exist |

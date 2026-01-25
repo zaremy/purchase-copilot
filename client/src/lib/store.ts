@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Candidate, ChecklistResponse, ChecklistPreset, INITIAL_PRESETS } from './data';
+import type { EntitlementsResponse } from '@shared/types';
 
 export interface UserProfile {
   firstName: string;
@@ -43,6 +44,8 @@ const USER_SCOPED_INITIAL = {
   vehicles: [] as LocalVehicle[],
   candidates: [] as Candidate[],
   userProfile: null as UserProfile | null,
+  entitlements: null as EntitlementsResponse | null,
+  entitlementsLoading: false,
 };
 
 interface AppState {
@@ -52,6 +55,9 @@ interface AppState {
   onboardingComplete: boolean;
   // Vehicle state
   vehicles: LocalVehicle[];
+  // Entitlements state
+  entitlements: EntitlementsResponse | null;
+  entitlementsLoading: boolean;
   addCandidate: (candidate: Candidate) => void;
   updateCandidate: (id: string, updates: Partial<Candidate>) => void;
   deleteCandidate: (id: string) => void;
@@ -66,6 +72,9 @@ interface AppState {
   updateVehicle: (id: string, updates: Partial<LocalVehicle>) => void;
   deleteVehicle: (id: string) => void;
   setVehicleChecklistResponse: (vehicleId: string, itemId: string, response: ChecklistResponse) => void;
+  // Entitlements actions
+  setEntitlements: (entitlements: EntitlementsResponse | null) => void;
+  setEntitlementsLoading: (loading: boolean) => void;
   resetStore: () => void;
 }
 
@@ -77,6 +86,8 @@ export const useStore = create<AppState>()(
       userProfile: null,
       onboardingComplete: false,
       vehicles: [],
+      entitlements: null,
+      entitlementsLoading: false,
       addCandidate: (candidate) =>
         set((state) => ({ candidates: [candidate, ...state.candidates] })),
       updateCandidate: (id, updates) =>
@@ -175,6 +186,11 @@ export const useStore = create<AppState>()(
             };
           }),
         })),
+      // Entitlements actions
+      setEntitlements: (entitlements) =>
+        set(() => ({ entitlements })),
+      setEntitlementsLoading: (entitlementsLoading) =>
+        set(() => ({ entitlementsLoading })),
       resetStore: () => set(USER_SCOPED_INITIAL),
     }),
     {
