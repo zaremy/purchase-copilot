@@ -2,11 +2,19 @@ import { defineConfig, type UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { readFileSync } from "fs";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { metaImagesPlugin } from "./vite-plugin-meta-images";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 
+const packageJson = JSON.parse(
+  readFileSync(path.resolve(import.meta.dirname, "package.json"), "utf-8")
+);
+
 export default defineConfig(async ({ mode }): Promise<UserConfig> => ({
+  define: {
+    __APP_VERSION__: JSON.stringify(packageJson.version),
+  },
   plugins: [
     react(),
     runtimeErrorOverlay(),
