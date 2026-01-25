@@ -19,13 +19,13 @@ app_phases:
   - id: phase3
     label: "Phase 3"
     closed: 0
-    total: 3
+    total: 4
     status: pending
 
   - id: phase4
     label: "Phase 4"
     closed: 0
-    total: 4
+    total: 5
     status: pending
 
 # Per-phase contextual items (for architecture tabs)
@@ -67,10 +67,14 @@ phase_details:
         status: pending
       - label: "Eval Harness"
         status: pending
+      - label: "Welcome Experience"
+        status: pending
 
   phase4:
     title: "Phase 4: Platform Scale"
     items:
+      - label: "Marketing Site"
+        status: pending
       - label: "Google Sign-In"
         status: pending
       - label: "Video Infrastructure"
