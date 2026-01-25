@@ -1,6 +1,6 @@
 # System Readiness - synced from GitHub milestones
 # Update command: gh api repos/zaremy/purchase-copilot/milestones --jq '.[] | {title, closed_issues, open_issues}'
-# Last updated: 2026-01-23
+# Last updated: 2026-01-24
 
 # App-wide phases (for homepage) - high-level view
 app_phases:
@@ -12,7 +12,7 @@ app_phases:
 
   - id: phase2
     label: "Phase 2"
-    closed: 1
+    closed: 2
     total: 3
     status: current
 
@@ -50,11 +50,11 @@ phase_details:
         closed: 5
         total: 5
       - label: "2B Auth"
-        status: current
-        closed: 4
-        total: 5
+        status: completed
+        closed: 2
+        total: 2
       - label: "2C Billing"
-        status: pending
+        status: current
         closed: 0
         total: 1
 
