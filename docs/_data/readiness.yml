@@ -1,6 +1,6 @@
 # System Readiness - synced from GitHub milestones
 # Update command: gh api repos/zaremy/purchase-copilot/milestones --jq '.[] | {title, closed_issues, open_issues}'
-# Last updated: 2026-01-24
+# Last updated: 2026-01-25
 
 # App-wide phases (for homepage) - high-level view
 app_phases:
@@ -12,20 +12,20 @@ app_phases:
 
   - id: phase2
     label: "Phase 2"
-    closed: 2
-    total: 3
-    status: current
+    closed: 9
+    total: 9
+    status: completed
 
   - id: phase3
     label: "Phase 3"
     closed: 0
-    total: 4
-    status: pending
+    total: 5
+    status: current
 
   - id: phase4
     label: "Phase 4"
     closed: 0
-    total: 5
+    total: 3
     status: pending
 
 # Per-phase contextual items (for architecture tabs)
@@ -53,33 +53,37 @@ phase_details:
         status: completed
         closed: 2
         total: 2
-      - label: "2C Billing"
+
+  phase3:
+    title: "Phase 3: Pro Plan (Tooling + Monetization)"
+    items:
+      - label: "3E Billing Tools"
         status: current
         closed: 0
         total: 1
-
-  phase3:
-    title: "Phase 3: AI Integration"
-    items:
-      - label: "LLM Integration"
+      - label: "3B VIN Tools"
         status: pending
-      - label: "Caching Layer"
+        closed: 0
+        total: 1
+      - label: "3C Media Tools"
         status: pending
-      - label: "Eval Harness"
+        closed: 0
+        total: 1
+      - label: "3A Reports Tool"
         status: pending
-      - label: "Welcome Experience"
+        closed: 0
+        total: 1
+      - label: "3D Guidance Orchestrator"
         status: pending
+        closed: 0
+        total: 1
 
   phase4:
-    title: "Phase 4: Platform Scale"
+    title: "Phase 4: Distribution + GTM"
     items:
-      - label: "Marketing Site"
+      - label: "Welcome Experience"
         status: pending
       - label: "Google Sign-In"
         status: pending
-      - label: "Video Infrastructure"
-        status: pending
-      - label: "Enterprise API"
-        status: pending
-      - label: "Advanced AI"
+      - label: "Marketing Site"
         status: pending
