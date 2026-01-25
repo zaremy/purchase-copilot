@@ -1,10 +1,22 @@
+import { useState, useEffect } from 'react';
 import { MobileLayout } from '@/components/MobileLayout';
 import { User, Shield, CircleHelp, ChevronRight, ListChecks, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link, useLocation } from 'wouter';
+import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 
 export default function Settings() {
   const [, setLocation] = useLocation();
+  const [appVersion, setAppVersion] = useState(__APP_VERSION__);
+
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      App.getInfo()
+        .then((info) => setAppVersion(info.version))
+        .catch(() => {});
+    }
+  }, []);
 
   const sections = [
     {
@@ -69,7 +81,7 @@ export default function Settings() {
         ))}
 
         <div className="text-center mt-8 pb-8">
-          <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-widest">Pre-Purchase Copilot v1.0.0</p>
+          <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-widest">Pre-Purchase Pal v{appVersion}</p>
         </div>
       </div>
     </MobileLayout>
