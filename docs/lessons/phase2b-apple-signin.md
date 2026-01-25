@@ -243,6 +243,33 @@ setUserProfile({ firstName, fullName, ... });
 {userProfile?.fullName || userProfile?.firstName || 'User'}
 ```
 
+## Native App Version Display (Issue #58)
+
+### Problem
+Settings footer showed hardcoded "Pre-Purchase Copilot v1.0.0" instead of dynamic version from iOS.
+
+### Solution
+Use `@capacitor/app` to get native version at runtime, fall back to package.json on web:
+```typescript
+// Settings.tsx
+const [appVersion, setAppVersion] = useState(__APP_VERSION__);
+
+useEffect(() => {
+  if (Capacitor.isNativePlatform()) {
+    App.getInfo()
+      .then((info) => setAppVersion(info.version))
+      .catch(() => {});
+  }
+}, []);
+
+// Footer: Pre-Purchase Pal v{appVersion}
+```
+
+### Key Points
+- `__APP_VERSION__` injected at build time via Vite `define` (from package.json)
+- `App.getInfo().version` returns CFBundleShortVersionString from Info.plist
+- Always add `.catch()` to prevent unhandled promise noise
+
 ## Maintenance Notes
 
 - **6-month secret rotation**: Apple client secrets expire after 6 months. Run `node scripts/generate-apple-secret.mjs` before 2026-07-23
