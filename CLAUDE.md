@@ -3,8 +3,20 @@
 ## Product Context
 - Pre-Purchase Pal: mobile-first vehicle inspection app.
 - Phase 1: shipped manual MVP.
-- Phase 2 (active): accounts + billing + entitlements.
-- Phase 3 (later): AI inspection guidance runtime.
+- Phase 2: shipped backend foundation (auth + infra).
+- Phase 3 (active): Pro Plan (tooling + monetization).
+- Phase 4 (later): Distribution + GTM.
+
+## AI/Tool-First Invariants (Non-Negotiable)
+Everything ships as deterministic tools that an AI/agent can call.
+
+Rules:
+- Every feature exposes a tool contract: name, inputs, outputs, errors, auth requirements, version.
+- Tools are deterministic + idempotent where possible (same inputs → same outputs; retries safe).
+- Side effects require explicit "action tools" with receipts (audit event + stable ids).
+- UI is a thin client over tools; no hidden business logic only in UI.
+- Canonical state is server-owned; UI reflects state, never invents it.
+- Every tool has: validation, rate/cost guardrails, logging, and test coverage for edge cases.
 
 ## Stack (assumed unless repo contradicts)
 - Frontend: React + TypeScript, Capacitor (iOS).
@@ -64,17 +76,26 @@ When compacting mid-issue, update the GitHub issue with current status before co
 **Do not ask for confirmation** — just execute the protocol. User can interrupt if needed.
 
 ## Phase Boundaries
-### Phase 2: Accounts/Billing
-- Auth + account identity.
-- Entitlements gating (server + client).
-- Billing provider integration + webhook/receipt sync.
-- Account management UI (manage subscription, delete account).
+### Phase 2: Backend Foundation (Complete)
+- 2A: Infrastructure migration (Replit → Supabase/Vercel)
+- 2B: Auth (Supabase Auth + Apple Sign-In)
 
-### Phase 3: AI
-- Canonical inspection session state model.
-- Deterministic context assembly (slots + caps).
-- Schema-validated responses (no free-form).
-- Observability + eval harness.
+### Phase 3: Pro Plan (Tooling + Monetization)
+Build order:
+1. 3E: Billing Tools (entitlement model first, paywall UI later)
+2. 3B: VIN Tools (decode/scan/lookup) + 3C: Media Tools (photo capture/attach)
+3. 3A: Reports Tool (generate/share/export - flagship paid output)
+4. 3D: Guidance Orchestrator (AI uses tools; no business logic in prompts)
+
+### Phase 4: Distribution + GTM
+- Welcome/Onboarding (activation funnels)
+- Google Sign-In (conversion friction reduction)
+- Marketing Site (acquisition)
+
+### Operability Lane (runs alongside Phase 3-4)
+- Cost controls, rate limits, abuse prevention
+- Logging, receipts, audit events
+- Error handling, retry logic
 
 ## Playbook Maintenance
 
@@ -100,6 +121,7 @@ Before updating `readiness.yml`:
 | Phase progress updates | `docs/_data/readiness.yml` |
 | Architecture changes | `docs/playbook/architecture.md` (in appropriate phase tab) |
 | New specs/contracts | `docs/specs/` |
+| **Tool contracts** | `docs/contracts/tools.md` |
 | Architecture decisions | `docs/decisions/` |
 | Research dumps | GitHub Discussions (not `/docs`) |
 | Lessons learned | `docs/lessons/<phase>-<topic>.md` |
@@ -156,7 +178,7 @@ Scheduled tasks, expiring credentials, etc.
 
 File: `docs/_data/readiness.yml`
 
-**When a sub-phase completes** (e.g., 2C Billing ships):
+**When a sub-phase completes** (e.g., 3E Billing Tools ships):
 1. Update the sub-phase status from `current` to `completed`
 2. Set `closed` equal to `total`
 3. Move `current` status to the next incomplete sub-phase
@@ -164,44 +186,41 @@ File: `docs/_data/readiness.yml`
    - Increment `closed` count for the parent phase
    - If all sub-phases done, set parent status to `completed` and move `current` to next phase
 
-**Example: Completing Phase 2C**
+**Example: Completing Phase 3E**
 ```yaml
 # Before
 app_phases:
-  - id: phase2
-    label: "Phase 2"
-    closed: 2
-    total: 3
+  - id: phase3
+    label: "Phase 3"
+    closed: 0
+    total: 5
     status: current
 
 phase_details:
-  phase2:
+  phase3:
     items:
-      - label: "2C Billing"
+      - label: "3E Billing Tools"
         status: current
         closed: 0
         total: 1
 
 # After
 app_phases:
-  - id: phase2
-    label: "Phase 2"
-    closed: 3
-    total: 3
-    status: completed
   - id: phase3
     label: "Phase 3"
-    closed: 0
-    total: 1
-    status: current  # moved here
+    closed: 1
+    total: 5
+    status: current  # still current, more sub-phases remain
 
 phase_details:
-  phase2:
+  phase3:
     items:
-      - label: "2C Billing"
+      - label: "3E Billing Tools"
         status: completed
         closed: 1
         total: 1
+      - label: "3B VIN Tools"
+        status: current  # next in sequence
 ```
 
 **Sync from GitHub milestones:**
