@@ -36,6 +36,33 @@ When compacting mid-issue, update the GitHub issue with current status before co
 - Any data/PII touch is explicitly called out with redaction policy.
 - **Blocking items completed**: If status table shows "Blocking Merge", all such items must be done before merge. If user requests merge with incomplete blockers, explicitly ask for confirmation.
 
+## Issue Closure Protocol
+
+**When user says "close issue", "ship it", or "done" — automatically execute these steps:**
+
+1. **Merge PR** (if not already merged)
+   ```bash
+   gh pr merge <number> --squash --delete-branch
+   ```
+
+2. **Verify issue closed** (should auto-close via "Closes #N" in PR)
+   ```bash
+   gh issue view <number> --json state
+   ```
+
+3. **Update lessons learned** (if significant learnings)
+   - Add to existing `docs/lessons/<phase>-<topic>.md` or create new file
+   - Include gotchas, patterns, and maintenance notes
+
+4. **Update readiness** (if sub-phase complete)
+   - Check milestone: `gh api repos/zaremy/purchase-copilot/milestones --jq '...'`
+   - Update `docs/_data/readiness.yml` if sub-phase status changes
+
+5. **Commit docs updates** (if any)
+   - Branch from main, commit, push, merge via PR
+
+**Do not ask for confirmation** — just execute the protocol. User can interrupt if needed.
+
 ## Phase Boundaries
 ### Phase 2: Accounts/Billing
 - Auth + account identity.
