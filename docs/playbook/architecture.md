@@ -236,6 +236,19 @@ We strictly limit the LLM to structured JSON output based on specific fields. It
 ### Contextual Caching
 We cache generated checklists by Year/Make/Model. If a user inspects a "2015 Honda Civic", we check if we've already generated a checklist for that car. This reduces LLM costs by 80%.
 
+---
+
+## Welcome Experience
+
+### Sign-in Screen
+- **Design Refresh**: Update after AI features ship
+- **Apple Sign-In**: Primary auth method (shipped in Phase 2B)
+- **Email/Password**: Secondary option
+
+### First-time UX
+- **Onboarding Flow**: Introduce core features to new users
+- **Post-AI Welcome**: Highlight AI-powered inspection guidance
+
 </div>
 
 <div id="phase4" class="phase-panel" role="tabpanel" markdown="1">
@@ -243,6 +256,15 @@ We cache generated checklists by Year/Make/Model. If a user inspects a "2015 Hon
 {% include readiness.html title="Phase 4 Progress" phases=site.data.readiness.phase_details.phase4.items %}
 
 ## Phase 4: Platform Scale
+
+### Marketing Site
+- **Landing Page**: Product overview, feature highlights
+- **App Store Links**: iOS download, future Android
+- **SEO**: Optimized for "used car inspection" keywords
+
+### Google Sign-In
+- **Provider:** Supabase Auth (Google OAuth)
+- **Platform:** Web + iOS (deferred from Phase 2B)
 
 ### Video Infrastructure
 - **Provider:** Daily.co / Twilio Video
