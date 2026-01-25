@@ -7,7 +7,7 @@ title: Technical Architecture
 
 **SYSTEM DESIGN**
 
-A robust, offline-first React Native application backed by a scalable Node.js/PostgreSQL backend.
+A mobile-first vehicle inspection app backed by a scalable Node.js/PostgreSQL backend.
 
 <div class="phase-tabs" role="tablist">
   <button class="phase-tab active" role="tab" aria-selected="true" data-tab="phase1">Phase 1</button>
@@ -28,13 +28,13 @@ The MVP architecture prioritizes offline-first capabilities, robust photo storag
 
 ---
 
-## MVP Tech Stack
+## MVP Tech Stack (Shipped)
 
 ### Mobile App
-- **Framework:** React Native (Expo)
-- **State:** TanStack Query (Offline)
-- **Storage:** MMKV (Local Persistence)
-- **UI:** NativeWind (Tailwind)
+- **Framework:** React 19 + Vite
+- **Native:** Capacitor 8 (iOS)
+- **State:** Zustand (persist middleware)
+- **UI:** Tailwind CSS
 
 ### Backend API
 - **Runtime:** Node.js (Express)
@@ -52,8 +52,8 @@ The MVP architecture prioritizes offline-first capabilities, robust photo storag
 
 ## Key Platform Decisions
 
-### Offline-First Sync
-Inspections often happen in dead zones. The app functions 100% offline, syncing data when connectivity is restored using TanStack Query's persistence adapters.
+### Offline-First Design
+Inspections often happen in dead zones. Local-first architecture with Zustand persist ensures data survives app restarts. Full offline sync deferred to Phase 3 tooling.
 
 ### Local-First Validation
 Zod schemas are shared between client and server. We validate all inputs on the device before they ever hit the network, ensuring instant feedback.
@@ -72,25 +72,15 @@ Fixed costs for Supabase Pro ($25), Vercel Pro ($20), and basic S3 storage. Supp
 
 ---
 
-## Billing Infrastructure (MVP)
-
-### In-App Purchases
-Direct integration with Apple App Store & Google Play Store via RevenueCat.
-
-- Single SKU: "Pro Upgrade" ($9.99)
-- Restores purchases across devices
-- Syncs `is_pro` status to Supabase User table
-
-### Web Payments
-Simple Stripe Checkout for web-based upgrades.
-
-- Stripe Webhook to Supabase Edge Function
-- Updates user role to 'pro'
-- No recurring billing logic needed yet
-
----
-
 ## Eliminated Platform Approaches
+
+### React Native / Expo Stack
+Originally planned: React Native (Expo), TanStack Query, MMKV, NativeWind.
+Shipped instead: React 19 + Vite + Capacitor, Zustand, localStorage, Tailwind CSS.
+Reason: Faster iteration, simpler toolchain. Capacitor provides native iOS access without React Native bridge complexity.
+
+### TanStack Query Offline
+Originally planned for offline-first sync. Replaced with Zustand for simpler state management. Full offline sync deferred to Phase 3 tooling.
 
 ### Blockchain Vehicle History
 Rejected due to lack of adoption by major DMVs and manufacturers. Centralized databases (CarFax) remain the source of truth.
@@ -149,16 +139,12 @@ Mandatory for iOS App Store compliance. Abstracts Apple's complex StoreKit APIs.
 
 ## Phase 2B Tech Stack (Authentication)
 
-### Shipped: Email/Password Auth
+### Shipped: Email/Password + Apple Sign-In
 - **Provider:** Supabase Auth
 - **Client:** `@supabase/supabase-js`
 - **State:** Zustand store with persist middleware
 - **UI:** Login (4 modes), Profile management, Sign Out
-
-### Pending: Apple Sign-In (#49)
-- **Provider:** Supabase Auth (Apple OAuth)
-- **iOS:** Native Sign in with Apple (ASAuthorizationController)
-- **Status:** In development
+- **Apple:** Native Sign in with Apple via `@capgo/capacitor-social-login`
 
 ### Security
 - **PKCE:** Enabled
@@ -172,8 +158,8 @@ Mandatory for iOS App Store compliance. Abstracts Apple's complex StoreKit APIs.
 ### Managed Integration Strategy
 We deliberately chose Vercel's native integrations for Supabase and Sentry over manual configuration. This ensures environment variables are automatically synced and deployments are atomically linked to database migrations and error tracking releases.
 
-### Phased Rollout (2A → 2B → 2C)
-Instead of a "big bang" release, we split the backend foundation into three distinct sub-phases: Infrastructure (Complete), Auth (Current), and Billing (Deferred). Google Sign-In was moved to Phase 4 to prioritize Apple Sign-In first (iOS App Store requirement). This isolates risk: we confirm the API works before adding user complexity, and confirm users work before adding payment complexity.
+### Phased Rollout (2A → 2B)
+Instead of a "big bang" release, we split the backend foundation into distinct sub-phases: Infrastructure (Complete), Auth (Complete). Billing moved to Phase 3 as first tool. Google Sign-In moved to Phase 4 to prioritize Apple Sign-In first (iOS App Store requirement).
 
 </div>
 
@@ -181,41 +167,80 @@ Instead of a "big bang" release, we split the backend foundation into three dist
 
 {% include readiness.html title="Phase 3 Progress" phases=site.data.readiness.phase_details.phase3.items %}
 
-## Phase 3: AI Integration
+## Phase 3: Pro Plan (Tooling + Monetization)
 
-### AI Tech Stack Additions
+Everything ships as deterministic tools that an AI/agent can call. Build order: Billing → VIN/Media → Reports → Guidance Orchestrator.
 
-#### LLM Services
-- **Model:** OpenAI GPT-4-turbo
-- **Mode:** JSON Mode (Strict)
-- **Context:** VIN + Market Data
-- **Caching:** OpenAI Caching Proxy (Mandatory)
+---
 
-#### Enriched Data
-- **Market Data:** MarketCheck API
-- **History:** CarFax/AutoCheck API
-- **Recall:** NHTSA Recall API
-- **Vector DB:** pgvector (Issues)
+## 3E: Billing Tools
 
-#### Performance
-- **Queue:** BullMQ (Async Jobs)
-- **Streaming:** Server-Sent Events
-- **Rate Limit:** Upstash Redis
-- **Monitoring:** Helicone / LangSmith
+Entitlement model first, paywall UI later.
 
-### Cost to Serve (Phase 3)
+### In-App Purchases (iOS)
+Direct integration with Apple App Store via RevenueCat.
 
-| Metric | Value |
-|--------|-------|
-| Monthly Infrastructure | $150 - $300 |
-| Cost Per Inspection | $0.45 |
-| Gross Margin | 96% |
+- Single SKU: "Pro Upgrade" ($9.99)
+- Restores purchases across devices
+- Syncs `is_pro` status to Supabase User table
 
-Even with AI costs, the $14.99 price point yields exceptional margins due to high caching hit rates.
+### Web Payments
+Simple Stripe Checkout for web-based upgrades.
+
+- Stripe Webhook to Supabase Edge Function
+- Updates user role to 'pro'
+- No recurring billing logic needed yet
+
+---
+
+## 3B: VIN Tools
+
+- **VIN Decode:** NHTSA API (Year/Make/Model/Engine)
+- **VIN Scan:** Camera OCR (deferred)
+- **VIN Lookup:** Market data enrichment (MarketCheck API)
+
+---
+
+## 3C: Media Tools
+
+- **Photo Capture:** Camera integration via Capacitor
+- **Photo Attach:** Link photos to inspection fields
+- **Storage:** Supabase Storage or S3
+
+---
+
+## 3A: Reports Tool
+
+Flagship paid output.
+
+- **Generate:** Compile inspection data into formatted report
+- **Share:** Export as PDF or shareable link
+- **Branding:** User/pro badge, timestamp
+
+---
+
+## 3D: Guidance Orchestrator
+
+AI calls tools; no business logic in prompts.
+
+### Tool-First Approach
+- **LLM:** JSON Mode (Strict) for structured output
+- **Orchestration:** AI selects which tools to call based on context
+- **Caching:** Cache guidance by Year/Make/Model (80% cost reduction)
+
+### Key Constraints
+- LLM limited to structured JSON output based on specific fields
+- Never generates free-form advice without citing the inspection field
+- Prevents hallucination and liability
 
 ---
 
 ## Eliminated AI Approaches
+
+### Heavy AI-First Architecture
+Originally planned: GPT-4-turbo with vector DB (pgvector), BullMQ queues, SSE streaming, Upstash Redis rate limiting, Helicone/LangSmith monitoring, MarketCheck/CarFax/NHTSA enrichment. Replaced with tool-first approach where AI orchestrates deterministic tools. Simpler, more testable, lower cost.
+
+Original cost projection: $150-300/mo infrastructure, $0.45/inspection.
 
 ### On-Device LLM (Llama Stack)
 Rejected due to hallucination risk and battery drain. Centralized API allows better guardrails and caching.
@@ -226,45 +251,44 @@ Rejected to maintain strict liability control. UI must be deterministic, not gen
 ### Agentic Frameworks (AutoGen)
 Rejected as overkill. The inspection flow is linear and structured, not requiring autonomous agent negotiation.
 
----
-
-## Key AI Decisions
-
-### Field-Only LLM Constraint
-We strictly limit the LLM to structured JSON output based on specific fields. It never generates free-form advice without citing the specific inspection field it relates to. This prevents hallucination and liability.
-
-### Contextual Caching
-We cache generated checklists by Year/Make/Model. If a user inspects a "2015 Honda Civic", we check if we've already generated a checklist for that car. This reduces LLM costs by 80%.
-
----
-
-## Welcome Experience
-
-### Sign-in Screen
-- **Design Refresh**: Update after AI features ship
-- **Apple Sign-In**: Primary auth method (shipped in Phase 2B)
-- **Email/Password**: Secondary option
-
-### First-time UX
-- **Onboarding Flow**: Introduce core features to new users
-- **Post-AI Welcome**: Highlight AI-powered inspection guidance
-
 </div>
 
 <div id="phase4" class="phase-panel" role="tabpanel" markdown="1">
 
 {% include readiness.html title="Phase 4 Progress" phases=site.data.readiness.phase_details.phase4.items %}
 
-## Phase 4: Platform Scale
+## Phase 4: Distribution + GTM
 
-### Marketing Site
+---
+
+## Welcome Experience
+
+### Sign-in Screen
+- **Design Refresh**: Update after Pro Plan features ship
+- **Apple Sign-In**: Primary auth method (shipped in Phase 2B)
+- **Email/Password**: Secondary option
+
+### First-time UX
+- **Onboarding Flow**: Introduce core features to new users
+- **Activation Funnels**: Guide users to first inspection
+
+---
+
+## Google Sign-In
+- **Provider:** Supabase Auth (Google OAuth)
+- **Platform:** Web + iOS (deferred from Phase 2B)
+- **Goal:** Conversion friction reduction
+
+---
+
+## Marketing Site
 - **Landing Page**: Product overview, feature highlights
 - **App Store Links**: iOS download, future Android
 - **SEO**: Optimized for "used car inspection" keywords
 
-### Google Sign-In
-- **Provider:** Supabase Auth (Google OAuth)
-- **Platform:** Web + iOS (deferred from Phase 2B)
+---
+
+## Deferred: Enterprise Features
 
 ### Video Infrastructure
 - **Provider:** Daily.co / Twilio Video
@@ -284,7 +308,7 @@ We cache generated checklists by Year/Make/Model. If a user inspects a "2015 Hon
 - **Voice:** Whisper (Dictation)
 - **Analysis:** Fine-tuned Llama 3
 
-### Cost to Serve (Phase 4)
+### Cost to Serve (Enterprise)
 
 | Metric | Value |
 |--------|-------|
@@ -296,7 +320,7 @@ On a $50 session, we net $10. Minus $1.20 cost = $8.80 profit per session.
 
 ---
 
-## Advanced Intelligence (RAG)
+## Deferred: Advanced Intelligence (RAG)
 
 ### Deep Diagnostics Pipeline
 Retrieval-Augmented Generation for enterprise-grade accuracy.
