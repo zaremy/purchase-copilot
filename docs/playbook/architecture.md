@@ -96,12 +96,8 @@ Rejected handling direct vehicle payments to avoid money transmitter licensing r
 
 ## Phase 2: Backend Foundation
 
-### Strategic Transition Plan
-
-To enable the AI Agent milestone, you must first establish a robust User Identity (Auth) and Billing foundation. Your current Replit-based backend is a bottleneck. Moving to a Supabase-centric architecture is the recommended path for <1000 users, offering the lowest friction and cost.
-
 ### Supabase Auth + Database
-Use Supabase for both Authentication and PostgreSQL. It replaces your custom Express auth logic with a secure, managed service.
+Supabase provides both Authentication and PostgreSQL, replacing custom Express auth logic with a secure, managed service.
 
 - **Zero-Config Auth:** Email/Password, Google, Apple login out of the box.
 - **Row Level Security (RLS):** Secure user data at the database level.
@@ -167,6 +163,13 @@ We deliberately chose Vercel's native integrations for Supabase and Sentry over 
 
 ### Phased Rollout (2A → 2B → 2C)
 Instead of a "big bang" release, we split the backend foundation into distinct sub-phases: Infrastructure (2A), Manual Auth (2B), Apple Auth (2C). Billing moved to Phase 3 as first tool. Google Sign-In moved to Phase 4 to prioritize Apple Sign-In first (iOS App Store requirement).
+
+---
+
+## Eliminated Platform Approaches
+
+### Replit Backend
+Originally deployed on Replit with custom Express auth logic. Migrated to Supabase-centric architecture for <1000 users — lower friction, managed auth, and generous free tier.
 
 </div>
 
