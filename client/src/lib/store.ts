@@ -4,6 +4,7 @@ import { Candidate, ChecklistResponse, ChecklistPreset, INITIAL_PRESETS } from '
 
 export interface UserProfile {
   firstName: string;
+  fullName: string;
   email: string;
   phone: string;
   zipCode: string;

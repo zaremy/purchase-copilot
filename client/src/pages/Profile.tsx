@@ -6,6 +6,10 @@ import { useState } from 'react';
 import { signOut } from '@/lib/supabase';
 import { features } from '@/lib/config';
 
+// Detect Apple's private relay email (Hide My Email feature)
+const isApplePrivateRelay = (email?: string) =>
+  email?.endsWith('@privaterelay.appleid.com');
+
 export default function Profile() {
   const { userProfile, resetStore } = useStore();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -41,7 +45,7 @@ export default function Profile() {
             <User className="w-10 h-10 text-neutral-400" />
           </div>
           <h2 className="font-bold text-lg text-neutral-900 font-tech uppercase tracking-wide" data-testid="text-profile-name">
-            {userProfile?.firstName || 'User'}
+            {userProfile?.fullName || userProfile?.firstName || 'User'}
           </h2>
           <p className="text-xs text-neutral-500 font-medium uppercase tracking-wide mt-1">Free Plan</p>
         </div>
@@ -51,8 +55,10 @@ export default function Profile() {
             <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1">Email</label>
             <div className="flex items-center gap-3">
               <Mail className="w-4 h-4 text-neutral-400" />
-              <p className="text-sm font-medium text-neutral-900" data-testid="text-profile-email">
-                {userProfile?.email || 'Not provided'}
+              <p className={`text-sm font-medium ${userProfile?.email ? 'text-neutral-900' : 'text-neutral-400'}`} data-testid="text-profile-email">
+                {isApplePrivateRelay(userProfile?.email)
+                  ? 'Hidden via Apple'
+                  : (userProfile?.email || 'Not provided')}
               </p>
             </div>
           </div>
@@ -60,7 +66,7 @@ export default function Profile() {
             <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1">Phone</label>
             <div className="flex items-center gap-3">
               <Phone className="w-4 h-4 text-neutral-400" />
-              <p className="text-sm font-medium text-neutral-900" data-testid="text-profile-phone">
+              <p className={`text-sm font-medium ${userProfile?.phone ? 'text-neutral-900' : 'text-neutral-400'}`} data-testid="text-profile-phone">
                 {userProfile?.phone || 'Not provided'}
               </p>
             </div>
@@ -69,7 +75,7 @@ export default function Profile() {
             <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1">Location</label>
             <div className="flex items-center gap-3 mb-2">
               <MapPin className="w-4 h-4 text-neutral-400" />
-              <p className="text-sm font-medium text-neutral-900" data-testid="text-profile-zip">
+              <p className={`text-sm font-medium ${userProfile?.zipCode ? 'text-neutral-900' : 'text-neutral-400'}`} data-testid="text-profile-zip">
                 {userProfile?.zipCode ? `ZIP: ${userProfile.zipCode}` : 'Not provided'}
               </p>
             </div>

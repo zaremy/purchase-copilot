@@ -41,6 +41,7 @@ export function Onboarding() {
     
     setUserProfile({
       firstName: form.firstName.trim(),
+      fullName: form.firstName.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
       zipCode: form.zipCode.trim(),

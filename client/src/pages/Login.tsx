@@ -9,7 +9,6 @@ import {
   SignUpMetadata,
 } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { Capacitor } from '@capacitor/core';
 import { ArrowLeft, Mail, RefreshCw, User, Lock, Phone, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -108,16 +107,15 @@ export default function Login() {
   const handleAppleSignIn = async () => {
     setLoading(true);
     try {
-      const { url } = await signInWithApple();
-      if (url && Capacitor.isNativePlatform()) {
-        window.location.href = url;
-      }
+      await signInWithApple();
+      // Auth state listener in App.tsx will pick up the session
     } catch (error: any) {
       toast({
         title: 'Apple Sign In failed',
         description: error.message || 'Please try again.',
         variant: 'destructive',
       });
+    } finally {
       setLoading(false);
     }
   };
@@ -183,7 +181,7 @@ export default function Login() {
   if (mode === 'check-email') {
     return (
       <div className="min-h-screen bg-[#F0EDE8] flex flex-col">
-        <div className="bg-neutral-900 text-white py-4 px-4 flex items-center">
+        <div className="bg-neutral-900 text-white px-4 pb-4 pt-safe flex items-center">
           <button onClick={goBack} className="p-2 -ml-2 hover:bg-neutral-800 rounded">
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -220,7 +218,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-[#F0EDE8] flex flex-col">
       {/* Header */}
-      <div className="bg-neutral-900 text-white py-4 px-4 flex items-center">
+      <div className="bg-neutral-900 text-white px-4 pb-4 pt-safe flex items-center">
         <button onClick={goBack} className="p-2 -ml-2 hover:bg-neutral-800 rounded">
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -231,11 +229,10 @@ export default function Login() {
 
       {/* Form */}
       <div className="flex-1 px-6 py-8 overflow-y-auto">
-        {/* Apple Sign In */}
+        {/* Apple Sign In - HIG compliant */}
         <Button
           type="button"
-          variant="outline"
-          className="w-full h-12 text-base font-medium border-neutral-300 bg-white mb-4"
+          className="w-full h-12 text-base font-medium bg-black text-white hover:bg-neutral-900 mb-4 rounded-lg"
           onClick={handleAppleSignIn}
           disabled={loading}
         >
@@ -246,7 +243,7 @@ export default function Login() {
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
               </svg>
-              Continue with Apple
+              Sign in with Apple
             </>
           )}
         </Button>

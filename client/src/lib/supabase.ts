@@ -1,5 +1,6 @@
 import { createClient, Session, User } from '@supabase/supabase-js';
 import { Capacitor } from '@capacitor/core';
+import { SocialLogin } from '@capgo/capacitor-social-login';
 
 // Environment variables - must be set in .env
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -76,18 +77,46 @@ export async function signInWithEmail(email: string, password: string) {
 }
 
 export async function signInWithApple() {
-  const redirectTo = Capacitor.isNativePlatform()
-    ? 'prepurchasepal://auth-callback'
-    : `${window.location.origin}/auth/callback`;
+  if (!Capacitor.isNativePlatform()) {
+    // Web: Use OAuth redirect flow
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) throw error;
+    return data;
+  }
 
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  // Native: Use Apple's native Sign In
+  const res = await SocialLogin.login({
     provider: 'apple',
-    options: {
-      redirectTo,
-      skipBrowserRedirect: Capacitor.isNativePlatform(),
-    },
+    options: { scopes: ['email', 'name'] },
+  });
+
+  const idToken = res?.result?.idToken;
+  if (!idToken) throw new Error('Apple idToken missing');
+
+  // Exchange Apple's identity token for Supabase session
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    provider: 'apple',
+    token: idToken,
   });
   if (error) throw error;
+
+  // Apple name is only available on first consent; persist it if present
+  const profile = res?.result?.profile;
+  if (profile?.givenName || profile?.familyName) {
+    await supabase.auth.updateUser({
+      data: {
+        full_name: `${profile.givenName ?? ''} ${profile.familyName ?? ''}`.trim(),
+        given_name: profile.givenName ?? null,
+        family_name: profile.familyName ?? null,
+      },
+    });
+  }
+
   return data;
 }
 
