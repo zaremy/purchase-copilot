@@ -18,7 +18,7 @@ app_phases:
 
   - id: phase3
     label: "Phase 3"
-    closed: 0
+    closed: 1
     total: 5
     status: current
 
@@ -62,11 +62,11 @@ phase_details:
     title: "Phase 3: Pro Plan (Tooling + Monetization)"
     items:
       - label: "3E Billing Tools"
-        status: current
-        closed: 0
+        status: completed
+        closed: 1
         total: 1
       - label: "3B VIN Tools"
-        status: pending
+        status: current
         closed: 0
         total: 1
       - label: "3C Media Tools"
