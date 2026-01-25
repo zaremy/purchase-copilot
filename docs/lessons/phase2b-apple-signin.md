@@ -181,20 +181,66 @@ setUserProfile({
 });
 ```
 
-### Wouter Redirect Gotcha
-When Login is rendered directly (not via Router), wouter's `location` is `/` not `/login`. To detect sign-in and redirect, track previous session with `useRef`:
+### Interactive Sign-In Redirect (Improved Pattern)
+When Login is rendered directly (not via Router), wouter's `location` is `/` not `/login`. The `prevSessionRef` pattern has a flaw: it triggers on cold start when a session already exists.
+
+**Better approach**: Track the SIGNED_IN event itself with a ref, only redirect after interactive sign-in:
 ```typescript
-const prevSessionRef = useRef<Session | null>(null);
+const didInteractiveSignInRef = useRef(false);
 
-useEffect(() => {
-  const wasLoggedOut = prevSessionRef.current === null;
-  const isLoggedIn = session !== null;
-
-  if (wasLoggedOut && isLoggedIn && !authLoading) {
-    setLocation('/');
+// In auth state subscription:
+onAuthStateChange((event, s) => {
+  setSession(s);
+  if (event === 'SIGNED_IN') {
+    didInteractiveSignInRef.current = true;
   }
-  prevSessionRef.current = session;
-}, [session, authLoading, setLocation]);
+  if (event === 'SIGNED_OUT') {
+    didInteractiveSignInRef.current = false;  // Clear to avoid stale redirect
+  }
+});
+
+// Redirect effect:
+useEffect(() => {
+  if (didInteractiveSignInRef.current && session && !authLoading) {
+    didInteractiveSignInRef.current = false;
+    if (location !== '/') {  // Prevent redundant route writes
+      setLocation('/');
+    }
+  }
+}, [session, authLoading, location, setLocation]);
+```
+
+### Hide My Email (Apple Privacy Relay)
+When users choose "Hide My Email" in Sign in with Apple, they get a `@privaterelay.appleid.com` address. Apple guideline: "honor the user's choice."
+
+Display a friendly label instead of the relay address:
+```typescript
+const isApplePrivateRelay = (email?: string) =>
+  email?.endsWith('@privaterelay.appleid.com');
+
+// In Profile display:
+{isApplePrivateRelay(email) ? 'Hidden via Apple' : email || 'Not provided'}
+```
+
+### fullName Field for Profile Display
+Apple Sign-In provides `full_name` in user metadata. Add a `fullName` field to `UserProfile` for proper display:
+```typescript
+// store.ts
+export interface UserProfile {
+  firstName: string;
+  fullName: string;  // New field
+  email: string;
+  phone: string;
+  zipCode: string;
+}
+
+// App.tsx hydration
+const fullName = meta?.full_name || meta?.name || '';
+const firstName = fullName.split(' ')[0] || '';
+setUserProfile({ firstName, fullName, ... });
+
+// Profile.tsx display
+{userProfile?.fullName || userProfile?.firstName || 'User'}
 ```
 
 ## Maintenance Notes
