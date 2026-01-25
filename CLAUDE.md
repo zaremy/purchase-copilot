@@ -73,6 +73,18 @@ When compacting mid-issue, update the GitHub issue with current status before co
 5. **Commit docs updates** (if any)
    - Branch from main, commit, push, merge via PR
 
+6. **Show progress recap** (always)
+   - Display current phase progress with visual bars
+   - Example format:
+   ```
+   Phase 3 Progress:
+   3E Billing Tools    ████████████ complete
+   3B VIN Tools        ░░░░░░░░░░░░ current ← next
+   3C Media Tools      ░░░░░░░░░░░░ pending
+   3A Reports Tool     ░░░░░░░░░░░░ pending
+   3D Guidance         ░░░░░░░░░░░░ pending
+   ```
+
 **Do not ask for confirmation** — just execute the protocol. User can interrupt if needed.
 
 ## Phase Boundaries
