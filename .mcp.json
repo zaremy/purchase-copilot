@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "dev-docs": {
+      "command": "npx",
+      "args": ["tsx", "tools/dev-docs-mcp/index.ts"],
+      "cwd": "/Users/yuriy/Projects/PrePurchase-Copilot/purchase-copilot"
+    }
+  }
+}

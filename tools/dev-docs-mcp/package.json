@@ -1,0 +1,18 @@
+{
+  "name": "dev-docs-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for developer documentation (Apple, GitHub, extensible)",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "node-html-parser": "^6.1.13"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "@types/node": "^20.11.0"
+  }
+}
